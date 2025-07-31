@@ -150,15 +150,6 @@ export function RetailRanking({ data }: RetailRankingProps) {
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-sm font-medium text-foreground">
-                    {retail.averageTime} min
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Tempo médio
-                  </div>
-                </div>
-
                 <div className="flex flex-col items-end gap-2">
                   {getEngagementBadge(retail.engagementScore)}
                   {retail.growth > 0 ? (
