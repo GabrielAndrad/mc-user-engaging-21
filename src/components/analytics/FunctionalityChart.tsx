@@ -93,12 +93,6 @@ export function FunctionalityChart({ data, onDrilldown }: FunctionalityChartProp
             radius={[4, 4, 0, 0]}
           />
           <Bar 
-            dataKey="tempoMedio" 
-            name="Tempo Médio (min)"
-            fill="#52c41a"
-            radius={[4, 4, 0, 0]}
-          />
-          <Bar 
             dataKey="percentualUsuarios" 
             name="% Usuários Ativos"
             fill="#faad14"
