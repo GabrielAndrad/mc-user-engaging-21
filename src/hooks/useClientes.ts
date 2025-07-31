@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { apiService } from '@/services/apiService';
+import { useAccessToken } from './useAccessToken';
 
 interface Cliente {
   ClienteId: number;
@@ -28,22 +30,20 @@ export function useClientes() {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const accessToken = useAccessToken();
 
   useEffect(() => {
     const fetchClientes = async () => {
+      if (!accessToken) return;
+      
       try {
         setLoading(true);
-        const response = await fetch('https://api-prod.meucliente.app.br/api/Cliente/completo');
-        
-        if (!response.ok) {
-          throw new Error('Erro ao buscar clientes');
-        }
-        
-        const data = await response.json();
+        apiService.setAccessToken(accessToken);
+        const data = await apiService.get<Cliente[]>('/Cliente/completo');
         setClientes(data);
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro desconhecido');
+        setError(err instanceof Error ? err.message : 'Erro ao buscar clientes');
         setClientes([]);
       } finally {
         setLoading(false);
@@ -51,7 +51,7 @@ export function useClientes() {
     };
 
     fetchClientes();
-  }, []);
+  }, [accessToken]);
 
   return { clientes, loading, error };
 }
