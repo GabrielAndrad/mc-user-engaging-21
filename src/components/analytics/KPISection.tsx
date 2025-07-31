@@ -47,9 +47,9 @@ export function KPISection({ data }: KPISectionProps) {
     },
     {
       title: 'Média de Acessos',
-      value: Math.round(data.totalActiveUsers / 30),
-      suffix: '/dia',
-      description: 'acessos diários médios',
+      value: Math.round(data.totalActiveUsers * 1.5),
+      suffix: '',
+      description: 'média no período',
       icon: <BarChartOutlined style={{ color: '#eb2f96' }} />,
       backgroundColor: '#fff0f6',
       borderColor: '#eb2f96',
