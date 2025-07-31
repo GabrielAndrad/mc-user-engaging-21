@@ -2,7 +2,7 @@ import { Card, Row, Col, Statistic, Typography } from 'antd';
 import { 
   UserOutlined, 
   ThunderboltOutlined, 
-  ClockCircleOutlined, 
+  BarChartOutlined, 
   TrophyOutlined,
   CrownOutlined,
   StarOutlined 
@@ -50,7 +50,7 @@ export function KPISection({ data }: KPISectionProps) {
       value: Math.round(data.totalActiveUsers / 30),
       suffix: '/dia',
       description: 'acessos diários médios',
-      icon: <ClockCircleOutlined style={{ color: '#eb2f96' }} />,
+      icon: <BarChartOutlined style={{ color: '#eb2f96' }} />,
       backgroundColor: '#fff0f6',
       borderColor: '#eb2f96',
       iconBackgroundColor: '#fffafc',
