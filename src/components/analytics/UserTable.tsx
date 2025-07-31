@@ -80,22 +80,6 @@ export function UserTable({ data, onExport }: UserTableProps) {
       sorter: (a, b) => a.account.localeCompare(b.account)
     },
     {
-      title: 'Tipo',
-      dataIndex: 'type',
-      key: 'type',
-      render: (type: keyof typeof USER_TYPE_LABELS) => (
-        <Tag color={USER_TYPE_COLORS[type]}>
-          {USER_TYPE_LABELS[type]}
-        </Tag>
-      ),
-      filters: [
-        { text: 'Varejo', value: 'varejo' },
-        { text: 'Indústria', value: 'industria' },
-        { text: 'PhotoCheck', value: 'photocheck' }
-      ],
-      onFilter: (value, record) => record.type === value
-    },
-    {
       title: 'Funcionalidade',
       dataIndex: 'functionality',
       key: 'functionality'
