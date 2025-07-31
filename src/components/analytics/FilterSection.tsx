@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { DateRange } from 'react-day-picker';
+import { useClientes } from '@/hooks/useClientes';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
@@ -53,6 +54,7 @@ const NPS_OPTIONS = [
 
 export function FilterSection({ filters, onFiltersChange, onExport }: FilterSectionProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const { clientes, loading: loadingClientes } = useClientes();
 
   const handleDatePreset = (days: number) => {
     const to = new Date();
@@ -141,11 +143,13 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
               placeholder="Selecionar conta..."
               style={{ width: '100%' }}
               allowClear
+              loading={loadingClientes}
             >
-              <Select.Option value="supermercado-extra">Supermercado Extra</Select.Option>
-              <Select.Option value="carrefour">Carrefour</Select.Option>
-              <Select.Option value="koch">Koch</Select.Option>
-              <Select.Option value="bigbox">BigBox</Select.Option>
+              {clientes.map(cliente => (
+                <Select.Option key={cliente.ClienteId} value={cliente.ClienteId.toString()}>
+                  {cliente.NomeEmpresa}
+                </Select.Option>
+              ))}
             </Select>
           </Space>
         </Col>

@@ -80,22 +80,6 @@ export function UserTable({ data, onExport }: UserTableProps) {
       sorter: (a, b) => a.account.localeCompare(b.account)
     },
     {
-      title: 'Tipo',
-      dataIndex: 'type',
-      key: 'type',
-      render: (type: keyof typeof USER_TYPE_LABELS) => (
-        <Tag color={USER_TYPE_COLORS[type]}>
-          {USER_TYPE_LABELS[type]}
-        </Tag>
-      ),
-      filters: [
-        { text: 'Varejo', value: 'varejo' },
-        { text: 'Indústria', value: 'industria' },
-        { text: 'PhotoCheck', value: 'photocheck' }
-      ],
-      onFilter: (value, record) => record.type === value
-    },
-    {
       title: 'Funcionalidade',
       dataIndex: 'functionality',
       key: 'functionality'
@@ -107,21 +91,6 @@ export function UserTable({ data, onExport }: UserTableProps) {
       align: 'right',
       sorter: (a, b) => a.totalAccess - b.totalAccess,
       render: (value) => <span style={{ fontWeight: 500 }}>{value}</span>
-    },
-    {
-      title: 'Tempo total',
-      dataIndex: 'totalTime',
-      key: 'totalTime',
-      align: 'right',
-      sorter: (a, b) => a.totalTime - b.totalTime,
-      render: (value) => formatTime(value)
-    },
-    {
-      title: 'Tempo médio',
-      dataIndex: 'averageTime',
-      key: 'averageTime',
-      align: 'right',
-      render: (value) => formatTime(value)
     },
     {
       title: 'Último acesso',
@@ -165,17 +134,6 @@ export function UserTable({ data, onExport }: UserTableProps) {
             style={{ width: 300 }}
             allowClear
           />
-          <Select
-            value={typeFilter || undefined}
-            onChange={(value) => setTypeFilter(value || '')}
-            placeholder="Todos os tipos"
-            style={{ width: 150 }}
-            allowClear
-          >
-            <Select.Option value="varejo">Varejo</Select.Option>
-            <Select.Option value="industria">Indústria</Select.Option>
-            <Select.Option value="photocheck">PhotoCheck</Select.Option>
-          </Select>
           <Select
             value={functionalityFilter || undefined}
             onChange={(value) => setFunctionalityFilter(value || '')}

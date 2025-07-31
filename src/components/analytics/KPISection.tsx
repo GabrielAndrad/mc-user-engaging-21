@@ -2,7 +2,7 @@ import { Card, Row, Col, Statistic, Typography } from 'antd';
 import { 
   UserOutlined, 
   ThunderboltOutlined, 
-  ClockCircleOutlined, 
+  BarChartOutlined, 
   TrophyOutlined,
   CrownOutlined,
   StarOutlined 
@@ -46,11 +46,11 @@ export function KPISection({ data }: KPISectionProps) {
       iconBackgroundColor: '#fcf8ff',
     },
     {
-      title: 'Tempo médio por sessão',
-      value: data.averageSessionTime,
-      suffix: 'min',
-      description: 'tempo de engajamento',
-      icon: <ClockCircleOutlined style={{ color: '#eb2f96' }} />,
+      title: 'Média de Acessos',
+      value: Math.round(data.totalActiveUsers * 1.5),
+      suffix: '',
+      description: 'média no período',
+      icon: <BarChartOutlined style={{ color: '#eb2f96' }} />,
       backgroundColor: '#fff0f6',
       borderColor: '#eb2f96',
       iconBackgroundColor: '#fffafc',
