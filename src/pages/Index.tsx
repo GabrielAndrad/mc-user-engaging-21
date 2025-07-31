@@ -101,7 +101,8 @@ const Index = () => {
         padding: '16px 24px',
         boxShadow: '0 4px 20px rgba(7, 57, 95, 0.15)',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        display: 'none'
       }}>
         {/* Decorative background elements */}
         <div style={{
