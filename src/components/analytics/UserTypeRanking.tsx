@@ -152,14 +152,7 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
                   </div>
                 </div>
 
-                <div className="text-right">
-                  <div className="text-sm font-medium text-foreground">
-                    {userType.averageTime} min
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Tempo médio
-                  </div>
-                </div>
+              
 
                 <div className="text-right">
                   <div className="text-sm font-medium text-foreground flex items-center gap-1">
