@@ -93,21 +93,6 @@ export function UserTable({ data, onExport }: UserTableProps) {
       render: (value) => <span style={{ fontWeight: 500 }}>{value}</span>
     },
     {
-      title: 'Tempo total',
-      dataIndex: 'totalTime',
-      key: 'totalTime',
-      align: 'right',
-      sorter: (a, b) => a.totalTime - b.totalTime,
-      render: (value) => formatTime(value)
-    },
-    {
-      title: 'Tempo médio',
-      dataIndex: 'averageTime',
-      key: 'averageTime',
-      align: 'right',
-      render: (value) => formatTime(value)
-    },
-    {
       title: 'Último acesso',
       dataIndex: 'lastAccess',
       key: 'lastAccess',
