@@ -150,17 +150,6 @@ export function UserTable({ data, onExport }: UserTableProps) {
             allowClear
           />
           <Select
-            value={typeFilter || undefined}
-            onChange={(value) => setTypeFilter(value || '')}
-            placeholder="Todos os tipos"
-            style={{ width: 150 }}
-            allowClear
-          >
-            <Select.Option value="varejo">Varejo</Select.Option>
-            <Select.Option value="industria">Indústria</Select.Option>
-            <Select.Option value="photocheck">PhotoCheck</Select.Option>
-          </Select>
-          <Select
             value={functionalityFilter || undefined}
             onChange={(value) => setFunctionalityFilter(value || '')}
             placeholder="Todas funcionalidades"
