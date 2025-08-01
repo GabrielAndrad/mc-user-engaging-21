@@ -248,19 +248,20 @@ export const generateRetailData = (): RetailData[] => {
 // Generate active users data
 export const generateActiveUsersData = () => {
   const userCount = Math.floor(Math.random() * 50) + 30;
-  const types: ('varejo' | 'industria' | 'photocheck')[] = ['varejo', 'industria', 'photocheck'];
   
   return Array.from({ length: userCount }, (_, index) => {
     const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-    const type = types[Math.floor(Math.random() * types.length)];
     const account = ACCOUNTS[Math.floor(Math.random() * ACCOUNTS.length)];
+    const functionality = FUNCTIONALITIES[Math.floor(Math.random() * FUNCTIONALITIES.length)];
     
     return {
       name,
       email: `${name.toLowerCase().replace(' ', '.')}@${account.toLowerCase().replace(' ', '')}.com.br`,
-      type,
       account,
-      sessions: Math.floor(Math.random() * 25) + 5,
+      functionality,
+      totalAccess: Math.floor(Math.random() * 100) + 10,
+      totalTime: Math.floor(Math.random() * 500) + 30, // em minutos
+      averageTime: Math.floor(Math.random() * 45) + 5, // em minutos
       lastAccess: getRandomDate()
     };
   });

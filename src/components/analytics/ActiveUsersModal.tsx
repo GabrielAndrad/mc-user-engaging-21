@@ -1,13 +1,16 @@
-import { Modal, Table, Tag, Button, Row, Col, Statistic, Card } from 'antd';
-import { DownloadOutlined, CloseOutlined } from '@ant-design/icons';
+import { Modal, Table, Tag, Button, Input } from 'antd';
+import { DownloadOutlined, CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { useState, useMemo } from 'react';
 
 interface ActiveUser {
   name: string;
   email: string;
-  type: 'varejo' | 'industria' | 'photocheck';
   account: string;
-  sessions: number;
+  functionality: string;
+  totalAccess: number;
+  totalTime: number; // em minutos
+  averageTime: number; // em minutos
   lastAccess: string;
 }
 
@@ -18,62 +21,87 @@ interface ActiveUsersModalProps {
   onExport: () => void;
 }
 
-const USER_TYPE_LABELS = {
-  varejo: 'Varejo',
-  industria: 'Indústria',
-  photocheck: 'PhotoCheck'
-};
-
-const USER_TYPE_COLORS = {
-  varejo: 'blue',
-  industria: 'purple',
-  photocheck: 'green'
-};
-
 export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUsersModalProps) {
-  const totalUsers = users.length;
-  const totalSessions = users.reduce((sum, user) => sum + user.sessions, 0);
-  const averageSessions = totalUsers > 0 ? totalSessions / totalUsers : 0;
+  const [searchText, setSearchText] = useState('');
+
+  // Filtrar usuários baseado na busca
+  const filteredUsers = useMemo(() => {
+    if (!searchText) return users;
+    
+    const searchLower = searchText.toLowerCase();
+    return users.filter(user => 
+      user.name.toLowerCase().includes(searchLower) ||
+      user.email.toLowerCase().includes(searchLower) ||
+      user.account.toLowerCase().includes(searchLower)
+    );
+  }, [users, searchText]);
+
+  // Função para formatar tempo em minutos para horas e minutos
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (hours > 0) {
+      return `${hours}h ${mins}min`;
+    }
+    return `${mins}min`;
+  };
 
   const columns: ColumnsType<ActiveUser> = [
     {
-      title: 'Nome do usuário',
+      title: 'Nome',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
     },
     {
       title: 'E-mail',
       dataIndex: 'email',
       key: 'email',
+      sorter: (a, b) => a.email.localeCompare(b.email),
       render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>
     },
     {
-      title: 'Tipo',
-      dataIndex: 'type',
-      key: 'type',
-      render: (type: keyof typeof USER_TYPE_LABELS) => (
-        <Tag color={USER_TYPE_COLORS[type]}>
-          {USER_TYPE_LABELS[type]}
-        </Tag>
-      )
-    },
-    {
-      title: 'Conta (varejo)',
+      title: 'Conta',
       dataIndex: 'account',
-      key: 'account'
+      key: 'account',
+      sorter: (a, b) => a.account.localeCompare(b.account)
     },
     {
-      title: 'Sessões',
-      dataIndex: 'sessions',
-      key: 'sessions',
+      title: 'Funcionalidade',
+      dataIndex: 'functionality',
+      key: 'functionality',
+      sorter: (a, b) => a.functionality.localeCompare(b.functionality)
+    },
+    {
+      title: 'Total de acessos',
+      dataIndex: 'totalAccess',
+      key: 'totalAccess',
       align: 'right',
+      sorter: (a, b) => a.totalAccess - b.totalAccess,
       render: (value) => <span style={{ fontWeight: 500 }}>{value}</span>
+    },
+    {
+      title: 'Tempo total',
+      dataIndex: 'totalTime',
+      key: 'totalTime',
+      align: 'right',
+      sorter: (a, b) => a.totalTime - b.totalTime,
+      render: (value) => formatTime(value)
+    },
+    {
+      title: 'Tempo médio',
+      dataIndex: 'averageTime',
+      key: 'averageTime',
+      align: 'right',
+      sorter: (a, b) => a.averageTime - b.averageTime,
+      render: (value) => formatTime(value)
     },
     {
       title: 'Último acesso',
       dataIndex: 'lastAccess',
-      key: 'lastAccess'
+      key: 'lastAccess',
+      sorter: (a, b) => new Date(a.lastAccess).getTime() - new Date(b.lastAccess).getTime()
     }
   ];
 
@@ -92,7 +120,7 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
               onClick={onExport}
               size="small"
             >
-              Exportar
+              Exportar Tabela
             </Button>
             <Button 
               type="text" 
@@ -106,57 +134,38 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
       open={isOpen}
       onCancel={onClose}
       footer={null}
-      width="90%"
-      style={{ maxWidth: '1400px' }}
+      width="95%"
+      style={{ maxWidth: '1600px' }}
       styles={{
-        body: { maxHeight: '70vh', overflowY: 'auto' }
+        body: { maxHeight: '75vh', overflowY: 'auto' }
       }}
     >
-      {/* Resumo dos usuários ativos */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col xs={24} sm={8}>
-          <Card size="small">
-            <Statistic
-              title="Total de usuários ativos"
-              value={totalUsers}
-              valueStyle={{ color: '#1890ff', fontWeight: 'bold' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card size="small">
-            <Statistic
-              title="Total de sessões"
-              value={totalSessions}
-              valueStyle={{ color: '#52c41a', fontWeight: 'bold' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card size="small">
-            <Statistic
-              title="Média de sessões por usuário"
-              value={averageSessions.toFixed(1)}
-              valueStyle={{ color: '#faad14', fontWeight: 'bold' }}
-            />
-          </Card>
-        </Col>
-      </Row>
+      {/* Campo de busca */}
+      <div style={{ marginBottom: 16 }}>
+        <Input
+          placeholder="Buscar por nome, e-mail ou conta..."
+          prefix={<SearchOutlined />}
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ maxWidth: 400 }}
+          allowClear
+        />
+      </div>
 
       {/* Tabela de usuários ativos */}
-      {users.length > 0 ? (
+      {filteredUsers.length > 0 ? (
         <Table
           columns={columns}
-          dataSource={users}
-          rowKey={(record, index) => `${record.name}-${index}`}
+          dataSource={filteredUsers}
+          rowKey={(record, index) => `${record.name}-${record.email}-${index}`}
           pagination={{
-            pageSize: 10,
+            pageSize: 15,
             showSizeChanger: true,
             showQuickJumper: true,
             size: 'small',
             showTotal: (total, range) => `${range[0]}-${range[1]} de ${total} usuários`
           }}
-          scroll={{ x: 800 }}
+          scroll={{ x: 1200 }}
           size="small"
         />
       ) : (
@@ -167,7 +176,7 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
           backgroundColor: '#fafafa',
           borderRadius: '6px'
         }}>
-          Nenhum usuário ativo encontrado no período selecionado.
+          {searchText ? 'Nenhum usuário encontrado para a busca realizada.' : 'Nenhum usuário ativo encontrado no período selecionado.'}
         </div>
       )}
     </Modal>
