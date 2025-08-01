@@ -22,9 +22,10 @@ interface KPIData {
 
 interface KPISectionProps {
   data: KPIData;
+  onActiveUsersClick?: () => void;
 }
 
-export function KPISection({ data }: KPISectionProps) {
+export function KPISection({ data, onActiveUsersClick }: KPISectionProps) {
   const kpis = [
      {
       title: 'Usuários ativos',
@@ -80,7 +81,7 @@ export function KPISection({ data }: KPISectionProps) {
   return (
     <div>
       <Row gutter={[12, 16]} justify="space-between" style={{ marginBottom: '12px', padding: '0 12px' }}>
-        {kpis.map((kpi, index) => (
+         {kpis.map((kpi, index) => (
           <Col flex="1" style={{ maxWidth: '19%' }} key={index}>
             <Card
               style={{
@@ -93,9 +94,11 @@ export function KPISection({ data }: KPISectionProps) {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                cursor: index === 0 ? 'pointer' : 'default'
               }}
               bodyStyle={{ padding: '20px', textAlign: 'center', position: 'relative', zIndex: 1 }}
+              onClick={index === 0 && onActiveUsersClick ? onActiveUsersClick : undefined}
             >
               <div style={{ 
                 position: 'absolute',

@@ -245,6 +245,27 @@ export const generateRetailData = (): RetailData[] => {
   });
 };
 
+// Generate active users data
+export const generateActiveUsersData = () => {
+  const userCount = Math.floor(Math.random() * 50) + 30;
+  const types: ('varejo' | 'industria' | 'photocheck')[] = ['varejo', 'industria', 'photocheck'];
+  
+  return Array.from({ length: userCount }, (_, index) => {
+    const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const account = ACCOUNTS[Math.floor(Math.random() * ACCOUNTS.length)];
+    
+    return {
+      name,
+      email: `${name.toLowerCase().replace(' ', '.')}@${account.toLowerCase().replace(' ', '')}.com.br`,
+      type,
+      account,
+      sessions: Math.floor(Math.random() * 25) + 5,
+      lastAccess: getRandomDate()
+    };
+  });
+};
+
 // Generate drilldown data for a specific functionality
 export const generateDrilldownData = (functionality: string) => {
   const userCount = Math.floor(Math.random() * 20) + 5;

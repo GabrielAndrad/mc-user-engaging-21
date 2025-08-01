@@ -10,6 +10,7 @@ import { UserTypeRanking } from '@/components/analytics/UserTypeRanking';
 import { TimelineChart } from '@/components/analytics/TimelineChart';
 import { UserTable } from '@/components/analytics/UserTable';
 import { DrilldownModal } from '@/components/analytics/DrilldownModal';
+import { ActiveUsersModal } from '@/components/analytics/ActiveUsersModal';
 import {
   generateMockUsers,
   generateFunctionalityData,
@@ -21,6 +22,7 @@ import {
   generateIndustriaRankingData,
   generatePhotocheckRankingData,
   generateDrilldownData,
+  generateActiveUsersData,
   UserData
 } from '@/utils/mockData';
 
@@ -44,6 +46,14 @@ const Index = () => {
   }>({
     isOpen: false,
     functionality: '',
+    users: []
+  });
+
+  const [activeUsersModal, setActiveUsersModal] = useState<{
+    isOpen: boolean;
+    users: any[];
+  }>({
+    isOpen: false,
     users: []
   });
 
@@ -77,6 +87,18 @@ const Index = () => {
 
   const handleDrilldownExport = () => {
     messageApi.success(`Dados da funcionalidade ${drilldownModal.functionality} exportados.`);
+  };
+
+  const handleActiveUsersClick = () => {
+    const activeUsers = generateActiveUsersData();
+    setActiveUsersModal({
+      isOpen: true,
+      users: activeUsers
+    });
+  };
+
+  const handleActiveUsersExport = () => {
+    messageApi.success('Dados dos usuários ativos exportados.');
   };
 
   useEffect(() => {
@@ -219,7 +241,7 @@ const Index = () => {
               border: '1px solid #f1f5f9',
               overflow: 'hidden'
             }}>
-              <KPISection data={kpiData} />
+              <KPISection data={kpiData} onActiveUsersClick={handleActiveUsersClick} />
             </div>
 
             {/* Functionality Chart */}
@@ -295,6 +317,14 @@ const Index = () => {
               functionality={drilldownModal.functionality}
               users={drilldownModal.users}
               onExport={handleDrilldownExport}
+            />
+
+            {/* Active Users Modal */}
+            <ActiveUsersModal
+              isOpen={activeUsersModal.isOpen}
+              onClose={() => setActiveUsersModal(prev => ({ ...prev, isOpen: false }))}
+              users={activeUsersModal.users}
+              onExport={handleActiveUsersExport}
             />
           </Space>
         </div>
