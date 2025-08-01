@@ -23,9 +23,13 @@ interface KPIData {
 interface KPISectionProps {
   data: KPIData;
   onActiveUsersClick?: () => void;
+  onNPSClick?: () => void;
+  onAccessClick?: () => void;
+  onFunctionalityClick?: () => void;
+  onRetailClick?: () => void;
 }
 
-export function KPISection({ data, onActiveUsersClick }: KPISectionProps) {
+export function KPISection({ data, onActiveUsersClick, onNPSClick, onAccessClick, onFunctionalityClick, onRetailClick }: KPISectionProps) {
   const kpis = [
      {
       title: 'Usuários ativos',
@@ -95,10 +99,16 @@ export function KPISection({ data, onActiveUsersClick }: KPISectionProps) {
                 justifyContent: 'space-between',
                 position: 'relative',
                 overflow: 'hidden',
-                cursor: index === 0 ? 'pointer' : 'default'
+                cursor: 'pointer'
               }}
               bodyStyle={{ padding: '20px', textAlign: 'center', position: 'relative', zIndex: 1 }}
-              onClick={index === 0 && onActiveUsersClick ? onActiveUsersClick : undefined}
+              onClick={() => {
+                if (index === 0 && onActiveUsersClick) onActiveUsersClick();
+                else if (index === 1 && onNPSClick) onNPSClick();
+                else if (index === 2 && onAccessClick) onAccessClick();
+                else if (index === 3 && onFunctionalityClick) onFunctionalityClick();
+                else if (index === 4 && onRetailClick) onRetailClick();
+              }}
             >
               <div style={{ 
                 position: 'absolute',

@@ -1,5 +1,5 @@
-import { Modal, Table, Tag, Button, Input } from 'antd';
-import { DownloadOutlined, CloseOutlined, SearchOutlined } from '@ant-design/icons';
+import { Modal, Table, Tag, Button, Input, Select } from 'antd';
+import { DownloadOutlined, CloseOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useState, useMemo } from 'react';
 
@@ -23,18 +23,80 @@ interface ActiveUsersModalProps {
 
 export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUsersModalProps) {
   const [searchText, setSearchText] = useState('');
+  const [accountFilter, setAccountFilter] = useState<string[]>([]);
+  const [functionalityFilter, setFunctionalityFilter] = useState<string[]>([]);
 
-  // Filtrar usuários baseado na busca
+  // Filtrar usuários baseado na busca e filtros
   const filteredUsers = useMemo(() => {
-    if (!searchText) return users;
+    let filtered = users;
     
-    const searchLower = searchText.toLowerCase();
-    return users.filter(user => 
-      user.name.toLowerCase().includes(searchLower) ||
-      user.email.toLowerCase().includes(searchLower) ||
-      user.account.toLowerCase().includes(searchLower)
-    );
-  }, [users, searchText]);
+    // Filtro de busca
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      filtered = filtered.filter(user => 
+        user.name.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        user.account.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Filtro de conta
+    if (accountFilter.length > 0) {
+      filtered = filtered.filter(user => accountFilter.includes(user.account));
+    }
+    
+    // Filtro de funcionalidade
+    if (functionalityFilter.length > 0) {
+      filtered = filtered.filter(user => functionalityFilter.includes(user.functionality));
+    }
+    
+    return filtered;
+  }, [users, searchText, accountFilter, functionalityFilter]);
+
+  // Obter valores únicos para filtros
+  const uniqueAccounts = useMemo(() => 
+    [...new Set(users.map(user => user.account))].sort(),
+    [users]
+  );
+
+  const uniqueFunctionalities = useMemo(() => 
+    [...new Set(users.map(user => user.functionality))].sort(),
+    [users]
+  );
+
+  // Função para criar filtro dropdown customizado
+  const getColumnSearchProps = (dataIndex: string, title: string) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: any) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Buscar ${title.toLowerCase()}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => confirm()}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Buscar
+          </Button>
+          <Button onClick={() => clearFilters && clearFilters()} size="small" style={{ width: 90 }}>
+            Limpar
+          </Button>
+        </div>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+    ),
+    onFilter: (value: any, record: any) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+  });
 
   // Função para formatar tempo em minutos para horas e minutos
   const formatTime = (minutes: number) => {
@@ -52,26 +114,38 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
+      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
+      ...getColumnSearchProps('name', 'Nome')
     },
     {
       title: 'E-mail',
       dataIndex: 'email',
       key: 'email',
       sorter: (a, b) => a.email.localeCompare(b.email),
-      render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>
+      render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>,
+      ...getColumnSearchProps('email', 'E-mail')
     },
     {
       title: 'Conta',
       dataIndex: 'account',
       key: 'account',
-      sorter: (a, b) => a.account.localeCompare(b.account)
+      sorter: (a, b) => a.account.localeCompare(b.account),
+      filters: uniqueAccounts.map(account => ({ text: account, value: account })),
+      onFilter: (value: any, record: ActiveUser) => record.account === value,
+      filterIcon: (filtered: boolean) => (
+        <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      )
     },
     {
       title: 'Funcionalidade',
       dataIndex: 'functionality',
       key: 'functionality',
-      sorter: (a, b) => a.functionality.localeCompare(b.functionality)
+      sorter: (a, b) => a.functionality.localeCompare(b.functionality),
+      filters: uniqueFunctionalities.map(func => ({ text: func, value: func })),
+      onFilter: (value: any, record: ActiveUser) => record.functionality === value,
+      filterIcon: (filtered: boolean) => (
+        <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
+      )
     },
     {
       title: 'Total de acessos',
@@ -113,22 +187,14 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
             <div style={{ width: '4px', height: '24px', background: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)', borderRadius: '2px' }} />
             Usuários Ativos - Detalhamento
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <Button 
-              type="default" 
-              icon={<DownloadOutlined />} 
-              onClick={onExport}
-              size="small"
-            >
-              Exportar Tabela
-            </Button>
-            <Button 
-              type="text" 
-              icon={<CloseOutlined />} 
-              onClick={onClose}
-              size="small"
-            />
-          </div>
+          <Button 
+            type="default" 
+            icon={<DownloadOutlined />} 
+            onClick={onExport}
+            size="small"
+          >
+            Exportar Tabela
+          </Button>
         </div>
       }
       open={isOpen}

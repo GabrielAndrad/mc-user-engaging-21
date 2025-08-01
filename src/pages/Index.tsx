@@ -11,6 +11,10 @@ import { TimelineChart } from '@/components/analytics/TimelineChart';
 import { UserTable } from '@/components/analytics/UserTable';
 import { DrilldownModal } from '@/components/analytics/DrilldownModal';
 import { ActiveUsersModal } from '@/components/analytics/ActiveUsersModal';
+import { NPSModal } from '@/components/analytics/NPSModal';
+import { AccessModal } from '@/components/analytics/AccessModal';
+import { FunctionalityModal } from '@/components/analytics/FunctionalityModal';
+import { RetailModal } from '@/components/analytics/RetailModal';
 import {
   generateMockUsers,
   generateFunctionalityData,
@@ -56,6 +60,11 @@ const Index = () => {
     isOpen: false,
     users: []
   });
+
+  const [npsModal, setNPSModal] = useState(false);
+  const [accessModal, setAccessModal] = useState(false);
+  const [functionalityModal, setFunctionalityModal] = useState(false);
+  const [retailModal, setRetailModal] = useState(false);
 
   // Mock data
   const [userData] = useState<UserData[]>(() => generateMockUsers(150));
@@ -241,7 +250,14 @@ const Index = () => {
               border: '1px solid #f1f5f9',
               overflow: 'hidden'
             }}>
-              <KPISection data={kpiData} onActiveUsersClick={handleActiveUsersClick} />
+              <KPISection 
+                data={kpiData} 
+                onActiveUsersClick={handleActiveUsersClick}
+                onNPSClick={() => setNPSModal(true)}
+                onAccessClick={() => setAccessModal(true)}
+                onFunctionalityClick={() => setFunctionalityModal(true)}
+                onRetailClick={() => setRetailModal(true)}
+              />
             </div>
 
             {/* Functionality Chart */}
@@ -325,6 +341,38 @@ const Index = () => {
               onClose={() => setActiveUsersModal(prev => ({ ...prev, isOpen: false }))}
               users={activeUsersModal.users}
               onExport={handleActiveUsersExport}
+            />
+
+            {/* NPS Modal */}
+            <NPSModal
+              isOpen={npsModal}
+              onClose={() => setNPSModal(false)}
+              npsScore={kpiData.npsScore}
+              onExport={() => messageApi.success('Dados NPS exportados.')}
+            />
+
+            {/* Access Modal */}
+            <AccessModal
+              isOpen={accessModal}
+              onClose={() => setAccessModal(false)}
+              averageAccess={Math.round(kpiData.totalActiveUsers * 1.5)}
+              onExport={() => messageApi.success('Dados de acesso exportados.')}
+            />
+
+            {/* Functionality Modal */}
+            <FunctionalityModal
+              isOpen={functionalityModal}
+              onClose={() => setFunctionalityModal(false)}
+              functionality={kpiData.topFunctionality}
+              onExport={() => messageApi.success('Dados de funcionalidade exportados.')}
+            />
+
+            {/* Retail Modal */}
+            <RetailModal
+              isOpen={retailModal}
+              onClose={() => setRetailModal(false)}
+              retailName={kpiData.topAccount}
+              onExport={() => messageApi.success('Dados de varejo exportados.')}
             />
           </Space>
         </div>
