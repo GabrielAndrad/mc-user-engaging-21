@@ -260,8 +260,6 @@ export const generateActiveUsersData = () => {
       account,
       functionality,
       totalAccess: Math.floor(Math.random() * 100) + 10,
-      totalTime: Math.floor(Math.random() * 500) + 30, // em minutos
-      averageTime: Math.floor(Math.random() * 45) + 5, // em minutos
       lastAccess: getRandomDate()
     };
   });

@@ -9,8 +9,6 @@ interface ActiveUser {
   account: string;
   functionality: string;
   totalAccess: number;
-  totalTime: number; // em minutos
-  averageTime: number; // em minutos
   lastAccess: string;
 }
 
@@ -98,15 +96,6 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
       record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
   });
 
-  // Função para formatar tempo em minutos para horas e minutos
-  const formatTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}h ${mins}min`;
-    }
-    return `${mins}min`;
-  };
 
   const columns: ColumnsType<ActiveUser> = [
     {
@@ -154,22 +143,6 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
       align: 'right',
       sorter: (a, b) => a.totalAccess - b.totalAccess,
       render: (value) => <span style={{ fontWeight: 500 }}>{value}</span>
-    },
-    {
-      title: 'Tempo total',
-      dataIndex: 'totalTime',
-      key: 'totalTime',
-      align: 'right',
-      sorter: (a, b) => a.totalTime - b.totalTime,
-      render: (value) => formatTime(value)
-    },
-    {
-      title: 'Tempo médio',
-      dataIndex: 'averageTime',
-      key: 'averageTime',
-      align: 'right',
-      sorter: (a, b) => a.averageTime - b.averageTime,
-      render: (value) => formatTime(value)
     },
     {
       title: 'Último acesso',
