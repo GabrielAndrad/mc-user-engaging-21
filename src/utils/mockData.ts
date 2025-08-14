@@ -271,13 +271,13 @@ export const generateDrilldownData = (functionality: string) => {
   const types: ('varejo' | 'industria' | 'photocheck')[] = ['varejo', 'industria', 'photocheck'];
   
   return Array.from({ length: userCount }, (_, index) => {
-    const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+    const Name = NAMES[Math.floor(Math.random() * NAMES.length)];
     const type = types[Math.floor(Math.random() * types.length)];
     const account = ACCOUNTS[Math.floor(Math.random() * ACCOUNTS.length)];
     
     return {
-      name,
-      email: `${name.toLowerCase().replace(' ', '.')}@${account.toLowerCase().replace(' ', '')}.com.br`,
+      Name,
+      email: `${Name.toLowerCase().replace(' ', '.')}@${account.toLowerCase().replace(' ', '')}.com.br`,
       type,
       account,
       totalTime: Math.floor(Math.random() * 200) + 30,

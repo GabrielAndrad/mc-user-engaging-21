@@ -6,15 +6,11 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Trophy, Star, Users, Building2, ShoppingCart, Camera } from 'lucide-react';
 
 interface DetailedRankingData {
-  id: string;
-  name: string;
-  totalAccess: number;
-  averageTime: number;
-  engagementScore: number;
-  growth: number;
-  userCount?: number;
-  location?: string;
-  segment?: string;
+  Id:number;
+  Nome: string;
+  TotalAcessos: number;
+  ScoreEngajamento: number;
+  QuantidadeUsuarios?: number;
 }
 
 interface UserTypeRankingProps {
@@ -33,9 +29,9 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
   // Sort data
   const sortedData = [...currentData].sort((a, b) => {
     if (sortOrder === 'desc') {
-      return b.engagementScore - a.engagementScore;
+      return b.ScoreEngajamento - a.ScoreEngajamento;
     }
-    return a.engagementScore - b.engagementScore;
+    return a.ScoreEngajamento - b.ScoreEngajamento;
   });
 
   // Limit data
@@ -126,7 +122,7 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
         <div className="space-y-4">
           {displayData.map((userType, index) => (
             <div
-              key={userType.id}
+              key={userType.Id}
               className="flex items-center justify-between p-4 rounded-lg border border-border bg-background hover:bg-accent/50 transition-colors"
             >
               <div className="flex items-center gap-4">
@@ -135,9 +131,9 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
                 </div>
                 
                 <div className="space-y-1">
-                  <h3 className="font-semibold text-foreground">{userType.name}</h3>
+                  <h3 className="font-semibold text-foreground">{userType.Nome}</h3>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>{userType.totalAccess.toLocaleString()} acessos</span>
+                    <span>{userType.TotalAcessos.toLocaleString()} acessos</span>
                   </div>
                 </div>
               </div>
@@ -145,7 +141,7 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
               <div className="flex items-center gap-6">
                 <div className="text-right">
                   <div className="text-lg font-bold text-foreground">
-                    {userType.engagementScore}%
+                    {userType.ScoreEngajamento}%
                   </div>
                   <div className="text-sm text-muted-foreground">
                     Score Engajamento
@@ -157,7 +153,7 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
                 <div className="text-right">
                   <div className="text-sm font-medium text-foreground flex items-center gap-1">
                     <Users className="w-3 h-3" />
-                    {userType.userCount.toLocaleString()}
+                    {userType.QuantidadeUsuarios.toLocaleString()}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     Usuários
@@ -165,7 +161,7 @@ export function UserTypeRanking({ varejoData, industriaData, photocheckData }: U
                 </div>
 
                 <div className="flex flex-col items-end">
-                  {getEngagementBadge(userType.engagementScore)}
+                  {getEngagementBadge(userType.ScoreEngajamento)}
                 </div>
               </div>
             </div>

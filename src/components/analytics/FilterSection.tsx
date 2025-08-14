@@ -20,6 +20,7 @@ export interface FilterState {
 
 interface FilterSectionProps {
   filters: FilterState;
+  Combos:any,
   onFiltersChange: (filters: FilterState) => void;
   onExport: () => void;
 }
@@ -36,23 +37,18 @@ const USER_TYPES = [
   { value: 'photocheck', label: 'Operação (PhotoCheck)' },
 ];
 
-const FUNCTIONALITIES = [
-  'PhotoCheck',
-  'JBP',
-  'ROI',
-  'Sell-Out',
-  'Painel de Indicadores',
-  'Cadastro de Loja',
-  'Análise de Vendas',
-];
-
 const NPS_OPTIONS = [
   { value: 'promotores', label: 'Promotores (9-10)' },
   { value: 'neutros', label: 'Neutros (7-8)' },
   { value: 'detratores', label: 'Detratores (0-6)' },
 ];
 
-export function FilterSection({ filters, onFiltersChange, onExport }: FilterSectionProps) {
+export function FilterSection({
+  filters = { dateRange: undefined, userTypes: [], functionality: '', account: '', nps: '' },
+  onFiltersChange,
+  onExport,
+  Combos
+}: FilterSectionProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { clientes, loading: loadingClientes } = useClientes();
 
@@ -100,7 +96,7 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
 
   return (
     <Card 
-      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)',width:'100%' }}
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6} lg={5}>
@@ -127,9 +123,9 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
               style={{ width: '100%' }}
               allowClear
             >
-              {FUNCTIONALITIES.map(func => (
-                <Select.Option key={func} value={func}>{func}</Select.Option>
-              ))}
+              {Combos && Combos.ComboMenu?Combos.ComboMenu.map(func => (
+                <Select.Option key={func.MenuId} value={func.MenuId}>{func.Nome}</Select.Option>
+              )):[]}
             </Select>
           </Space>
         </Col>

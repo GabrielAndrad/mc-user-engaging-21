@@ -1,10 +1,11 @@
 import { Modal, Statistic, Card, Row, Col, Button, Empty } from 'antd';
 import { DownloadOutlined, TrophyOutlined } from '@ant-design/icons';
+import { MaisAcessada } from '@/interface/MaisAcessado';
 
 interface FunctionalityModalProps {
   isOpen: boolean;
   onClose: () => void;
-  functionality: string;
+  functionality: MaisAcessada;
   onExport: () => void;
 }
 
@@ -23,7 +24,7 @@ export function FunctionalityModal({ isOpen, onClose, functionality, onExport }:
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ width: '4px', height: '24px', background: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)', borderRadius: '2px' }} />
-            Funcionalidade mais acessada - {functionality}
+            Funcionalidade mais acessada - {functionality && functionality.MaisAcessada}
           </div>
           <Button 
             type="default" 
@@ -42,42 +43,21 @@ export function FunctionalityModal({ isOpen, onClose, functionality, onExport }:
       style={{ maxWidth: '800px' }}
     >
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col span={6}>
+        <Col span={12}>
           <Card>
             <Statistic
               title="Total de Usuários"
-              value={stats.totalUsers}
+              value={functionality && functionality.TotalUsuario}
               valueStyle={{ color: '#1890ff' }}
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col span={12}>
           <Card>
             <Statistic
               title="Total de Acessos"
-              value={stats.totalAccess}
+              value={functionality && functionality.TotalAcessos}
               valueStyle={{ color: '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Tempo Médio"
-              value={stats.averageTime}
-              suffix="min"
-              valueStyle={{ color: '#722ed1' }}
-            />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic
-              title="Nota Satisfação"
-              value={stats.satisfactionScore}
-              precision={1}
-              suffix="/10"
-              valueStyle={{ color: '#faad14' }}
             />
           </Card>
         </Col>
@@ -86,10 +66,10 @@ export function FunctionalityModal({ isOpen, onClose, functionality, onExport }:
       <Card title="Detalhes de Engajamento" style={{ textAlign: 'center' }}>
         <TrophyOutlined style={{ fontSize: 48, color: '#faad14', marginBottom: 16 }} />
         <p style={{ fontSize: 16, marginBottom: 8 }}>
-          <strong>{functionality}</strong> é a funcionalidade com maior engajamento
+          <strong>{functionality && functionality.MaisAcessada}</strong> é a funcionalidade com maior engajamento
         </p>
         <p style={{ color: '#8c8c8c' }}>
-          Com {stats.totalUsers.toLocaleString()} usuários únicos e {stats.totalAccess.toLocaleString()} acessos no período selecionado
+          Com {functionality && functionality.TotalUsuario.toLocaleString()} usuários únicos e {functionality && functionality.TotalAcessos.toLocaleString()} acessos no período selecionado
         </p>
       </Card>
     </Modal>

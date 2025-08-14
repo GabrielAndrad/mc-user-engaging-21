@@ -2,25 +2,16 @@ import { useState } from 'react';
 import { Card, Table, Input, Button, Tag, Select, Space, Typography } from 'antd';
 import { SearchOutlined, DownloadOutlined, SortAscendingOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { UsuarioAtivoEngajamento } from '@/interface/UsuariosAtivos';
 
 const { Title } = Typography;
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  account: string;
-  type: 'varejo' | 'industria' | 'photocheck';
-  functionality: string;
-  totalAccess: number;
-  totalTime: number;
-  averageTime: number;
-  lastAccess: string;
-}
+
 
 interface UserTableProps {
-  data: UserData[];
+  data: UsuarioAtivoEngajamento[];
   onExport: () => void;
+  comboFuncionalidade:any,
 }
 
 const USER_TYPE_LABELS = {
@@ -35,7 +26,7 @@ const USER_TYPE_COLORS = {
   photocheck: 'green'
 };
 
-export function UserTable({ data, onExport }: UserTableProps) {
+export function UserTable({ data, onExport,comboFuncionalidade }: UserTableProps) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('');
   const [functionalityFilter, setFunctionalityFilter] = useState<string>('');
@@ -48,55 +39,54 @@ export function UserTable({ data, onExport }: UserTableProps) {
   };
 
   const filteredData = data.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(search.toLowerCase()) ||
-                         user.email.toLowerCase().includes(search.toLowerCase()) ||
-                         user.account.toLowerCase().includes(search.toLowerCase());
-    const matchesType = !typeFilter || user.type === typeFilter;
-    const matchesFunctionality = !functionalityFilter || user.functionality === functionalityFilter;
-    
+    const searchTerm = (search || '').toLowerCase();
+  
+    const matchesSearch =
+      (user.Nome || '').toLowerCase().includes(searchTerm) ||
+      (user.Email || '').toLowerCase().includes(searchTerm) ||
+      (user.ClienteNome || '').toLowerCase().includes(searchTerm);
+  
+    const matchesType = !typeFilter
+    const matchesFunctionality = !functionalityFilter || user.ClienteNome === functionalityFilter;
+  
     return matchesSearch && matchesType && matchesFunctionality;
   });
 
-  const uniqueFunctionalities = [...new Set(data.map(user => user.functionality))];
+  const uniqueFunctionalities = [...new Set(data.map(user => user.ClienteNome))];
 
-  const columns: ColumnsType<UserData> = [
+  const columns: ColumnsType<UsuarioAtivoEngajamento> = [
     {
       title: 'Nome do usuário',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      dataIndex: 'Nome',
+      key: 'Nome',
+      sorter: (a, b) => a.Nome.localeCompare(a.Nome),
       render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
     },
     {
       title: 'E-mail',
-      dataIndex: 'email',
-      key: 'email',
+      dataIndex: 'Email',
+      key: 'Email',
       render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>
     },
     {
       title: 'Conta (varejo)',
-      dataIndex: 'account',
-      key: 'account',
-      sorter: (a, b) => a.account.localeCompare(b.account)
-    },
-    {
-      title: 'Funcionalidade',
-      dataIndex: 'functionality',
-      key: 'functionality'
+      dataIndex: 'ClienteNome',
+      key: 'ClienteNome',
+      sorter: (a, b) => a.ClienteNome.localeCompare(a.ClienteNome)
     },
     {
       title: 'Total de acessos',
-      dataIndex: 'totalAccess',
-      key: 'totalAccess',
+      dataIndex: 'TotalAcesso',
+      key: 'TotalAcesso',
       align: 'right',
-      sorter: (a, b) => a.totalAccess - b.totalAccess,
+      sorter: (a, b) => a.TotalAcesso - b.TotalAcesso,
       render: (value) => <span style={{ fontWeight: 500 }}>{value}</span>
     },
     {
       title: 'Último acesso',
-      dataIndex: 'lastAccess',
-      key: 'lastAccess',
-      sorter: (a, b) => new Date(a.lastAccess).getTime() - new Date(b.lastAccess).getTime()
+      dataIndex: 'UltimoAcesso',
+      key: 'UltimoAcesso',
+      sorter: (a, b) => new Date(a.UltimoAcesso).getTime() - new Date(b.UltimoAcesso).getTime()
     }
   ];
 
@@ -141,9 +131,9 @@ export function UserTable({ data, onExport }: UserTableProps) {
             style={{ width: 200 }}
             allowClear
           >
-            {uniqueFunctionalities.map(func => (
-              <Select.Option key={func} value={func}>{func}</Select.Option>
-            ))}
+            {comboFuncionalidade? comboFuncionalidade.map(func => (
+              <Select.Option key={func.MenuId} value={func.MenuId}>{func.Nome}</Select.Option>
+            )):[]}
           </Select>
         </div>
       </Space>

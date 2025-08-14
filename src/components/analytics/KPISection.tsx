@@ -1,12 +1,33 @@
-import { Card, Row, Col, Statistic, Typography } from 'antd';
-import { 
-  UserOutlined, 
-  ThunderboltOutlined, 
-  BarChartOutlined, 
+import { Card, Row, Col, Statistic, Typography, Spin, message } from 'antd';
+import {
+  UserOutlined,
+  ThunderboltOutlined,
+  BarChartOutlined,
   TrophyOutlined,
   CrownOutlined,
-  StarOutlined 
+  StarOutlined
 } from '@ant-design/icons';
+import { createSafeStream } from '@/utils/stream-factory';
+import { EvolucaoDiaria, IndicadoresState, LoadComboMenu, LoadIndicadoresEngajamento, LoadUserDetalhe, openCloseActiveUsersModal, openCloseFuncionalidadeMaisAcessada, openCloseMediaAcesso, openCloseNpsModal, openCloseVarejoMaisEngajado, RankingVarejo, UtilizacaoPorFuncionalidade } from '@/Stores/Indicadores-store';
+import { plug } from 'luffie';
+import React, { useState } from 'react';
+import { FunctionalityData, generateActiveUsersData, generateDrilldownData, TimelineData } from '@/utils/mockData';
+import { ActiveUsersModal } from './ActiveUsersModal';
+import { NpsDetalhes } from '@/interface/Nps';
+import { NPSModal } from './NPSModal';
+import { UsuarioAtivoEngajamento } from '@/interface/UsuariosAtivos';
+import { RetailModal } from './RetailModal';
+import { VarejoMaisEngajado } from '@/interface/VarejoMaisEngajado';
+import { AccessModal } from './AccessModal';
+import { MediaAcessos } from '@/interface/mediaAcessos';
+import { FunctionalityModal } from './FunctionalityModal';
+import { MaisAcessada } from '@/interface/MaisAcessado';
+import { FunctionalityChart } from './FunctionalityChart';
+import { TimelineChart } from './TimelineChart';
+import { FunctionalityRanking } from './FunctionalityRanking';
+import { UserTypeRanking } from './UserTypeRanking';
+import { UserTable } from './UserTable';
+import { FilterSection } from './FilterSection';
 
 const { Text } = Typography;
 
@@ -17,23 +38,52 @@ interface KPIData {
   topFunctionality: string;
   topAccount: string;
   totalUsers: number;
+  AcessMedia: number;
   npsScore: number;
 }
 
 interface KPISectionProps {
   data: KPIData;
-  onActiveUsersClick?: () => void;
-  onNPSClick?: () => void;
-  onAccessClick?: () => void;
-  onFunctionalityClick?: () => void;
-  onRetailClick?: () => void;
+  Isloading: boolean;
+  OpenActiveUsersModal: boolean;
+  OpenNpsModal: boolean;
+  DataNpsDetalhes: NpsDetalhes;
+  DataUsuariosAtivosDetalhes: UsuarioAtivoEngajamento[];
+  OpenVarejoMaisEngajado: boolean;
+  DataVarejoMaisEngajado: VarejoMaisEngajado,
+  DataUtilizacaoPorFuncionalidade: any,
+  DataEvolucaoDiaria: any,
+  DataRankingVarejo: any,
+  DataMediaAcessos: MediaAcessos,
+  OpenMediaAcesso: boolean;
+  DataMaisAcessada: MaisAcessada,
+  OpenMaisAcessada: false,
+  Filters: any
 }
 
-export function KPISection({ data, onActiveUsersClick, onNPSClick, onAccessClick, onFunctionalityClick, onRetailClick }: KPISectionProps) {
+export const KPISection: React.FC<KPISectionProps> = ({
+  data,
+  Isloading,
+  OpenActiveUsersModal,
+  DataNpsDetalhes,
+  OpenNpsModal,
+  DataUsuariosAtivosDetalhes,
+  OpenVarejoMaisEngajado,
+  DataVarejoMaisEngajado,
+  DataMediaAcessos,
+  OpenMediaAcesso,
+  DataMaisAcessada,
+  OpenMaisAcessada,
+  DataUtilizacaoPorFuncionalidade,
+  DataEvolucaoDiaria,
+  DataRankingVarejo,
+  Filters
+}) => {
+
   const kpis = [
-     {
+    {
       title: 'Usuários ativos',
-      value: `${data.totalActiveUsers} (${data.activeUsersPercentage}%) de ${data.totalUsers.toLocaleString()}`,
+      value: `${data.totalActiveUsers ?? 0} (${data.activeUsersPercentage ?? 0}%) de ${(data.totalUsers ?? 0).toLocaleString()}`,
       description: 'da base total',
       icon: <UserOutlined style={{ color: '#1890ff' }} />,
       backgroundColor: '#e6f7ff',
@@ -43,7 +93,7 @@ export function KPISection({ data, onActiveUsersClick, onNPSClick, onAccessClick
     },
     {
       title: 'NPS Score',
-      value: data.npsScore,
+      value: data && data.npsScore,
       description: 'índice de satisfação',
       icon: <StarOutlined style={{ color: '#722ed1' }} />,
       backgroundColor: '#f9f0ff',
@@ -52,7 +102,7 @@ export function KPISection({ data, onActiveUsersClick, onNPSClick, onAccessClick
     },
     {
       title: 'Média de Acessos',
-      value: Math.round(data.totalActiveUsers * 1.5),
+      value: Math.round(data.AcessMedia),
       suffix: '',
       description: 'média no período',
       icon: <BarChartOutlined style={{ color: '#eb2f96' }} />,
@@ -82,100 +132,279 @@ export function KPISection({ data, onActiveUsersClick, onNPSClick, onAccessClick
     }
   ];
 
+  const chartData: FunctionalityData[] = DataUtilizacaoPorFuncionalidade.map(item => ({
+    name: item.Name,
+    acessos: item.Acessos,
+    tempoMedio: item.TempoMedio,
+    percentualUsuarios: item.PercentualUsuarios
+  }));
+
+  const chartDataEvolucaoDiaria = DataEvolucaoDiaria.map(item => ({
+    date: item.Data,
+    acessos: item.TotalAcessos,
+    usuariosUnicos: item.UsuariosUnicos,
+    DiaSemana: item.DiaSemana
+  }));
+
   return (
     <div>
-      <Row gutter={[12, 16]} justify="space-between" style={{ marginBottom: '12px', padding: '0 12px' }}>
-         {kpis.map((kpi, index) => (
-          <Col flex="1" style={{ maxWidth: '19%' }} key={index}>
-            <Card
-              style={{
-                backgroundColor: kpi.backgroundColor,
-                border: `2px solid ${kpi.borderColor}`,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                borderRadius: '8px',
-                height: '160px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                position: 'relative',
-                overflow: 'hidden',
-                cursor: 'pointer'
-              }}
-              bodyStyle={{ padding: '20px', textAlign: 'center', position: 'relative', zIndex: 1 }}
-              onClick={() => {
-                if (index === 0 && onActiveUsersClick) onActiveUsersClick();
-                else if (index === 1 && onNPSClick) onNPSClick();
-                else if (index === 2 && onAccessClick) onAccessClick();
-                else if (index === 3 && onFunctionalityClick) onFunctionalityClick();
-                else if (index === 4 && onRetailClick) onRetailClick();
-              }}
-            >
-              <div style={{ 
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                width: '32px',
-                height: '32px',
-                backgroundColor: kpi.iconBackgroundColor,
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '16px'
+      <Spin spinning={Isloading}>
+        <Row gutter={[12,
+          16]} justify="space-between" style={{ marginBottom: '12px', padding: '0 12px' }}>
+          <FilterSection
+            filters={Filters}
+            onFiltersChange={() => { } }
+            onExport={() => { } } 
+            Combos={Filters}          
+            />
+          {kpis.map((kpi, index) => (
+            <Col flex="1" style={{ maxWidth: '19%' }} key={index}>
+              <div style={{
+                background: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                border: '1px solid #f1f5f9',
+                overflow: 'hidden'
               }}>
-                {kpi.icon}
               </div>
-              
-              <div style={{ color: '#595959', fontSize: '13px', marginBottom: '8px', fontWeight: 500 }}>
-                {kpi.title}
-              </div>
-              
-              {kpi.isText ? (
-                <div style={{ 
-                  fontSize: '16px', 
-                  fontWeight: 600, 
-                  color: '#262626',
-                  lineHeight: '1.3',
-                  marginBottom: '8px'
+              <Card
+                style={{
+                  backgroundColor: kpi.backgroundColor,
+                  border: `2px solid ${kpi.borderColor}`,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  borderRadius: '8px',
+                  height: '160px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  cursor: 'pointer'
+                }}
+                bodyStyle={{ padding: '20px', textAlign: 'center', position: 'relative', zIndex: 1 }}
+                onClick={() => {
+                  if (index === 0) openCloseActiveUsersModal(true);
+                  else if (index === 1) openCloseNpsModal(true);
+                  else if (index === 2) openCloseMediaAcesso(true);
+                  else if (index === 3) openCloseFuncionalidadeMaisAcessada(true);
+                  else if (index === 4) openCloseVarejoMaisEngajado(true);
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: kpi.iconBackgroundColor,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '16px'
                 }}>
-                  {kpi.value}
+                  {kpi.icon}
                 </div>
-              ) : (
-                <div style={{ 
-                  fontSize: '24px', 
-                  fontWeight: 700, 
-                  color: kpi.borderColor,
-                  marginBottom: '8px'
-                }}>
-                  {kpi.value}{kpi.suffix}
+
+                <div style={{ color: '#595959', fontSize: '13px', marginBottom: '8px', fontWeight: 500 }}>
+                  {kpi.title}
                 </div>
-              )}
-              
-              {kpi.description && (
-                <div style={{ 
-                  fontSize: '11px', 
-                  color: '#8c8c8c',
-                  backgroundColor: 'rgba(255,255,255,0.8)',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  marginTop: 'auto'
-                }}>
-                  {kpi.description}
-                </div>
-              )}
-            </Card>
-          </Col>
-        ))}
-      </Row>
-      <div style={{ 
-        textAlign: 'center', 
-        fontSize: '12px', 
-        color: '#8c8c8c', 
+
+                {kpi.isText ? (
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: '#262626',
+                    lineHeight: '1.3',
+                    marginBottom: '8px'
+                  }}>
+                    {kpi.value}
+                  </div>
+                ) : (
+                  <div style={{
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    color: kpi.borderColor,
+                    marginBottom: '8px'
+                  }}>
+                    {kpi.value}{kpi.suffix}
+                  </div>
+                )}
+
+                {kpi.description && (
+                  <div style={{
+                    fontSize: '11px',
+                    color: '#8c8c8c',
+                    backgroundColor: 'rgba(255,255,255,0.8)',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    marginTop: 'auto'
+                  }}>
+                    {kpi.description}
+                  </div>
+                )}
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </Spin>
+
+      <div style={{
+        textAlign: 'center',
+        fontSize: '12px',
+        color: '#8c8c8c',
         marginBottom: '24px',
         padding: '0 12px'
       }}>
-        💡 Clique o card para os detalhes da geração do indicador
+        💡 Clique no card para os detalhes da geração do indicador
       </div>
+
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden'
+      }}>
+        <FunctionalityChart
+          data={chartData}
+          onDrilldown={() => { }}
+        />
+      </div>
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden'
+      }}>
+        <TimelineChart data={chartDataEvolucaoDiaria} />
+      </div>
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden'
+      }}>
+        <FunctionalityRanking data={chartData} />
+      </div>
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden'
+      }}>
+        <UserTypeRanking
+          varejoData={DataRankingVarejo && DataRankingVarejo.DataVarejo ? DataRankingVarejo.DataVarejo : []}
+          industriaData={null}
+          photocheckData={null}
+        />
+      </div>
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden'
+      }}>
+        <UserTable
+          data={DataUsuariosAtivosDetalhes}
+          comboFuncionalidade={Filters && Filters.ComboMenu}
+          onExport={() => message.success('Dados dos usuários ativos exportados.')}
+        />
+      </div>
+
+      <ActiveUsersModal
+        isOpen={OpenActiveUsersModal}
+        onClose={() => openCloseActiveUsersModal(false)}
+        users={DataUsuariosAtivosDetalhes}
+        onExport={() => message.success('Dados dos usuários ativos exportados.')}
+      />
+      <NPSModal
+        isOpen={OpenNpsModal}
+        onClose={() => openCloseNpsModal(false)}
+        npsDetails={DataNpsDetalhes}
+        onExport={() => message.success('Dados NPS exportados.')}
+      />
+
+      <RetailModal
+        isOpen={OpenVarejoMaisEngajado}
+        onClose={() => openCloseVarejoMaisEngajado(false)}
+        retailName={{ ...DataVarejoMaisEngajado, VarejoName: data.topAccount }}
+        onExport={() => message.success('Dados de varejo exportados.')}
+      />
+
+      <AccessModal
+        isOpen={OpenMediaAcesso}
+        onClose={() => openCloseMediaAcesso(false)}
+        averageAccess={Math.round(DataMediaAcessos && DataMediaAcessos.UsuariosUnicos * 1.5)}
+        onExport={() => message.success('Dados de acesso exportados.')}
+        DataMediaAcessos={DataMediaAcessos}
+      />
+
+      <FunctionalityModal
+        isOpen={OpenMaisAcessada}
+        onClose={() => openCloseFuncionalidadeMaisAcessada(false)}
+        functionality={DataMaisAcessada}
+        onExport={() => message.success('Dados de funcionalidade exportados.')}
+      />
     </div>
   );
 }
+
+const stream = (props: any) => {
+  return createSafeStream({
+    streamName: 'CentroCusto',
+
+    // ✅ CARREGADORES INICIAIS
+    initialLoaders: [
+      () => {
+        LoadIndicadoresEngajamento();
+        UtilizacaoPorFuncionalidade();
+        EvolucaoDiaria();
+        RankingVarejo();
+        LoadUserDetalhe();
+        LoadComboMenu()
+      }
+    ],
+
+    // ✅ STORES PARA COMBINAR
+    stores: [
+      IndicadoresState
+    ],
+
+    // ✅ MAPPER CUSTOMIZADO
+    mapper: ([Indicadores]) => {
+      // ✅ SEGURANÇA: Verificar se estado está definido
+      const safeIndicadores = Indicadores || {};
+
+      return {
+        ...safeIndicadores,
+      };
+    },
+
+    // ✅ CONFIGURAÇÕES CUSTOMIZADAS
+    cacheDuration: 120000, // 2 minutos para centro de custo (dados estáveis)
+    debounceDelay: 50,    // Delay padrão
+
+    // ✅ CALLBACKS CUSTOMIZADOS
+    onError: (error) => {
+      console.error('💰 [IndicadoresStream] Erro crítico:', error);
+      // Em caso de erro, tentar recarregar dados básicos
+      try {
+        LoadIndicadoresEngajamento();
+      } catch (reloadError) {
+        console.error('💰 [IndicadoresStream] Falha ao recarregar centro de custo:', reloadError);
+      }
+    },
+
+    onCleanup: () => {
+      console.log('💰 [IndicadoresStream] Cleanup customizado executado');
+      // ✅ CLEANUP: Fechar formulários se necessário
+    }
+  });
+};
+
+export const IndicadoresScreen = plug(stream)(KPISection);
