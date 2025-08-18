@@ -2,20 +2,13 @@ import { Modal, Table, Tag, Button, Input, Select } from 'antd';
 import { DownloadOutlined, CloseOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useState, useMemo } from 'react';
+import { UsuarioAtivoEngajamento } from '@/interface/UsuariosAtivos';
 
-interface ActiveUser {
-  name: string;
-  email: string;
-  account: string;
-  functionality: string;
-  totalAccess: number;
-  lastAccess: string;
-}
 
 interface ActiveUsersModalProps {
   isOpen: boolean;
   onClose: () => void;
-  users: ActiveUser[];
+  users: UsuarioAtivoEngajamento[];
   onExport: () => void;
 }
 
@@ -32,20 +25,20 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower) ||
-        user.account.toLowerCase().includes(searchLower)
+        user.Nome.toLowerCase().includes(searchLower) ||
+        user.Email.toLowerCase().includes(searchLower) ||
+        user.ClienteNome.toLowerCase().includes(searchLower)
       );
     }
     
     // Filtro de conta
     if (accountFilter.length > 0) {
-      filtered = filtered.filter(user => accountFilter.includes(user.account));
+      filtered = filtered.filter(user => accountFilter.includes(user.ClienteNome));
     }
     
     // Filtro de funcionalidade
     if (functionalityFilter.length > 0) {
-      filtered = filtered.filter(user => functionalityFilter.includes(user.functionality));
+      filtered = filtered.filter(user => functionalityFilter.includes(user.Funcionalidade));
     }
     
     return filtered;
@@ -53,12 +46,12 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
 
   // Obter valores únicos para filtros
   const uniqueAccounts = useMemo(() => 
-    [...new Set(users.map(user => user.account))].sort(),
+    [...new Set(users.map(user => user.ClienteNome))].sort(),
     [users]
   );
 
   const uniqueFunctionalities = useMemo(() => 
-    [...new Set(users.map(user => user.functionality))].sort(),
+    [...new Set(users.map(user => user.Funcionalidade))].sort(),
     [users]
   );
 
@@ -97,58 +90,47 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
   });
 
 
-  const columns: ColumnsType<ActiveUser> = [
+  const columns: ColumnsType<UsuarioAtivoEngajamento> = [
     {
       title: 'Nome',
-      dataIndex: 'name',
-      key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      dataIndex: 'Nome',
+      key: 'Nome',
+      sorter: (a, b) => a.Nome.localeCompare(b.Nome),
       render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
-      ...getColumnSearchProps('name', 'Nome')
+      ...getColumnSearchProps('Nome', 'Nome')
     },
     {
       title: 'E-mail',
-      dataIndex: 'email',
-      key: 'email',
-      sorter: (a, b) => a.email.localeCompare(b.email),
+      dataIndex: 'Email',
+      key: 'Email',
+      sorter: (a, b) => a.Email.localeCompare(b.Email),
       render: (text) => <span style={{ color: '#8c8c8c' }}>{text}</span>,
-      ...getColumnSearchProps('email', 'E-mail')
+      ...getColumnSearchProps('Email', 'E-mail')
     },
     {
       title: 'Conta',
-      dataIndex: 'account',
-      key: 'account',
-      sorter: (a, b) => a.account.localeCompare(b.account),
+      dataIndex: 'ClienteNome',
+      key: 'ClienteNome',
+      sorter: (a, b) => a.ClienteNome.localeCompare(b.ClienteNome),
       filters: uniqueAccounts.map(account => ({ text: account, value: account })),
-      onFilter: (value: any, record: ActiveUser) => record.account === value,
-      filterIcon: (filtered: boolean) => (
-        <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-      )
-    },
-    {
-      title: 'Funcionalidade',
-      dataIndex: 'functionality',
-      key: 'functionality',
-      sorter: (a, b) => a.functionality.localeCompare(b.functionality),
-      filters: uniqueFunctionalities.map(func => ({ text: func, value: func })),
-      onFilter: (value: any, record: ActiveUser) => record.functionality === value,
+      onFilter: (value: any, record: UsuarioAtivoEngajamento) => record.ClienteNome === value,
       filterIcon: (filtered: boolean) => (
         <FilterOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
       )
     },
     {
       title: 'Total de acessos',
-      dataIndex: 'totalAccess',
-      key: 'totalAccess',
+      dataIndex: 'TotalAcesso',
+      key: 'TotalAcesso',
       align: 'right',
-      sorter: (a, b) => a.totalAccess - b.totalAccess,
+      sorter: (a, b) => a.TotalAcesso - b.TotalAcesso,
       render: (value) => <span style={{ fontWeight: 500 }}>{value}</span>
     },
     {
       title: 'Último acesso',
-      dataIndex: 'lastAccess',
-      key: 'lastAccess',
-      sorter: (a, b) => new Date(a.lastAccess).getTime() - new Date(b.lastAccess).getTime()
+      dataIndex: 'UltimoAcesso',
+      key: 'UltimoAcesso',
+      sorter: (a, b) => new Date(a.UltimoAcesso).getTime() - new Date(b.UltimoAcesso).getTime()
     }
   ];
 
@@ -196,7 +178,7 @@ export function ActiveUsersModal({ isOpen, onClose, users, onExport }: ActiveUse
         <Table
           columns={columns}
           dataSource={filteredUsers}
-          rowKey={(record, index) => `${record.name}-${record.email}-${index}`}
+          rowKey={(record, index) => `${record.Nome}-${record.Email}-${index}`}
           pagination={{
             pageSize: 15,
             showSizeChanger: true,

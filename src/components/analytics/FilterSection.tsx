@@ -6,21 +6,24 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { DateRange } from 'react-day-picker';
 import { useClientes } from '@/hooks/useClientes';
+import { LoadIndicadoresAll } from '@/Stores/Indicadores-store';
 
 const { RangePicker } = DatePicker;
 const { Title } = Typography;
 
 export interface FilterState {
-  dateRange: DateRange | undefined;
-  userTypes: string[];
-  functionality: string;
-  account: string;
-  nps: string;
+  dataInicio: Date;
+  dataFim: Date;
+  funcionalidade: number[];
+  varejo: number[];
+  Nps: number[];
+  PeriodosRapidos: number[];
 }
 
 interface FilterSectionProps {
-  filters: FilterState;
-  onFiltersChange: (filters: FilterState) => void;
+  ValuesFilters:FilterState,
+  Combos:any,
+  onFiltersChange: (dataIndex:string,value: any) => void;
   onExport: () => void;
 }
 
@@ -36,23 +39,18 @@ const USER_TYPES = [
   { value: 'photocheck', label: 'Operação (PhotoCheck)' },
 ];
 
-const FUNCTIONALITIES = [
-  'PhotoCheck',
-  'JBP',
-  'ROI',
-  'Sell-Out',
-  'Painel de Indicadores',
-  'Cadastro de Loja',
-  'Análise de Vendas',
-];
-
 const NPS_OPTIONS = [
-  { value: 'promotores', label: 'Promotores (9-10)' },
-  { value: 'neutros', label: 'Neutros (7-8)' },
-  { value: 'detratores', label: 'Detratores (0-6)' },
+  { value: 1, label: 'Promotores (9-10)' },
+  { value: 2, label: 'Neutros (7-8)' },
+  { value: 3, label: 'Detratores (0-6)' },
 ];
 
-export function FilterSection({ filters, onFiltersChange, onExport }: FilterSectionProps) {
+export function FilterSection({
+  ValuesFilters,
+  onFiltersChange,
+  onExport,
+  Combos
+}: FilterSectionProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const { clientes, loading: loadingClientes } = useClientes();
 
@@ -60,55 +58,35 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
     const to = new Date();
     const from = new Date();
     from.setDate(to.getDate() - days);
-    
-    onFiltersChange({
-      ...filters,
-      dateRange: { from, to }
-    });
+
+    // Atualiza os filtros de data conforme a lógica do componente
+    onFiltersChange('dataInicio', from.toISOString().slice(0, 10));
+    onFiltersChange('dataFim', to.toISOString().slice(0, 10));
   };
 
-  const handleDateRangeChange = (dates: [Dayjs | null, Dayjs | null] | null) => {
-    if (dates && dates[0] && dates[1]) {
-      onFiltersChange({
-        ...filters,
-        dateRange: {
-          from: dates[0].toDate(),
-          to: dates[1].toDate()
-        }
-      });
-    } else {
-      onFiltersChange({
-        ...filters,
-        dateRange: undefined
-      });
-    }
-  };
-
-  const handleUserTypeChange = (checkedValues: string[]) => {
-    onFiltersChange({
-      ...filters,
-      userTypes: checkedValues
-    });
-  };
-
-  const dateValue: [Dayjs | null, Dayjs | null] | null = filters.dateRange 
+  const dateValue: [Dayjs | null, Dayjs | null] | null =
+  ValuesFilters?.dataInicio && ValuesFilters?.dataFim
     ? [
-        filters.dateRange.from ? dayjs(filters.dateRange.from) : null,
-        filters.dateRange.to ? dayjs(filters.dateRange.to) : null
+        ValuesFilters.dataInicio ? dayjs(ValuesFilters.dataInicio) : null,
+        ValuesFilters.dataFim? dayjs(ValuesFilters.dataFim) : null
       ]
     : null;
 
   return (
     <Card 
-      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)',width:'100%' }}
     >
-      <Row gutter={[16, 16]}>
+      <Row style={{alignItems:'flex-end'}} gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6} lg={5}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Período</Typography.Text>
             <RangePicker
               value={dateValue}
-              onChange={handleDateRangeChange}
+              onChange={(dates) => {
+                  const formatDate = (date) => date ? date.format('YYYY-MM-DD') : null;
+                  onFiltersChange('dataInicio', formatDate(dates[0]));
+                  onFiltersChange('dataFim', formatDate(dates[1]));
+              }}
               format="DD/MM/YYYY"
               placeholder={['Data inicial', 'Data final']}
               style={{ width: '100%' }}
@@ -121,15 +99,15 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Funcionalidade</Typography.Text>
             <Select
-              value={filters.functionality || undefined}
-              onChange={(value) => onFiltersChange({ ...filters, functionality: value || '' })}
+              value={ValuesFilters.funcionalidade}
+              onChange={(value) => onFiltersChange('funcionalidade',value)}
               placeholder="Todas as funcionalidades"
               style={{ width: '100%' }}
               allowClear
             >
-              {FUNCTIONALITIES.map(func => (
-                <Select.Option key={func} value={func}>{func}</Select.Option>
-              ))}
+              {Combos && Combos.funcionalidade?Combos.funcionalidade.map(func => (
+                <Select.Option key={func.MenuId} value={func.MenuId}>{func.Nome}</Select.Option>
+              )):[]}
             </Select>
           </Space>
         </Col>
@@ -138,8 +116,8 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Varejo</Typography.Text>
             <Select
-              value={filters.account || undefined}
-              onChange={(value) => onFiltersChange({ ...filters, account: value || '' })}
+              value={ValuesFilters.varejo}
+              onChange={(value) => onFiltersChange('varejo',value)}
               placeholder="Selecionar conta..."
               style={{ width: '100%' }}
               allowClear
@@ -158,8 +136,8 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>NPS</Typography.Text>
             <Select
-              value={filters.nps || undefined}
-              onChange={(value) => onFiltersChange({ ...filters, nps: value || '' })}
+              value={ValuesFilters.Nps}
+              onChange={(value) => onFiltersChange('Nps',value)}
               placeholder="Todos os tipos"
               style={{ width: '100%' }}
               allowClear
@@ -170,15 +148,22 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
             </Select>
           </Space>
         </Col>
-
-        <Col xs={24} sm={12} md={6} lg={7}>
-          <div style={{ display: 'flex', alignItems: 'end', height: '100%', gap: '8px', justifyContent: 'flex-end' }}>
-            <Button
+        <Col span={1}>
+        <Button
               type="link"
               onClick={() => setShowAdvanced(!showAdvanced)}
               style={{ color: '#1890ff', padding: 0 }}
               icon={<FilterFilled style={{ color: '#1890ff' }} />}
             />
+        </Col>
+        <Col span={2}>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Button onClick={()=>LoadIndicadoresAll()} type='primary'>Filtrar</Button>
+          </Space>
+        </Col>
+
+        <Col span={4}>
+          <div style={{ display: 'flex', alignItems: 'end', height: '100%', gap: '8px', justifyContent: 'flex-end' }}>
             <Button 
               type="default" 
               icon={<DownloadOutlined />} 
@@ -196,24 +181,15 @@ export function FilterSection({ filters, onFiltersChange, onExport }: FilterSect
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={8}>
               <Space direction="vertical" style={{ width: '100%' }}>
-                <Typography.Text strong>Tipo de Usuário</Typography.Text>
-                <Checkbox.Group
-                  options={USER_TYPES}
-                  value={filters.userTypes}
-                  onChange={handleUserTypeChange}
-                />
-              </Space>
-            </Col>
-            <Col xs={24} sm={12} md={8}>
-              <Space direction="vertical" style={{ width: '100%' }}>
                 <Typography.Text strong>Períodos Rápidos</Typography.Text>
                 <Space wrap>
                   {PRESET_PERIODS.map(preset => (
                     <Button
                       key={preset.value}
                       size="small"
+                      onClick={()=>handleDatePreset(preset.value)}
                       type="dashed"
-                      onClick={() => handleDatePreset(preset.value)}
+
                     >
                       {preset.label}
                     </Button>

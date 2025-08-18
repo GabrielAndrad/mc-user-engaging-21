@@ -74,7 +74,7 @@ export function FunctionalityRanking({ data }: FunctionalityRankingProps) {
         <div>
           <Text strong style={{ fontSize: '14px', display: 'block' }}>{item.name}</Text>
           <Text type="secondary" style={{ fontSize: '12px' }}>
-            {item.tempoMedio} min • {item.percentualUsuarios}% usuários
+            {item.percentualUsuarios}% usuários
           </Text>
         </div>
       </div>

@@ -1,12 +1,14 @@
 import { Modal, Statistic, Card, Row, Col, Button, Table } from 'antd';
 import { DownloadOutlined, BarChartOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
+import { MediaAcessos } from '@/interface/mediaAcessos';
 
 interface AccessModalProps {
   isOpen: boolean;
   onClose: () => void;
   averageAccess: number;
   onExport: () => void;
+  DataMediaAcessos: MediaAcessos;
 }
 
 interface AccessData {
@@ -16,24 +18,31 @@ interface AccessData {
   averagePerUser: number;
 }
 
-export function AccessModal({ isOpen, onClose, averageAccess, onExport }: AccessModalProps) {
-  // Mock data para demonstração
+export function AccessModal({
+  isOpen,
+  onClose,
+  averageAccess,
+  onExport,
+  DataMediaAcessos,
+}: AccessModalProps) {
+
   const stats = {
-    totalAccess: 24567,
-    uniqueUsers: 1843,
-    peakHour: '14:00-15:00',
-    peakDay: 'Terça-feira'
+    totalAccess: DataMediaAcessos?.TotalAcessos ?? 0,
+    uniqueUsers: DataMediaAcessos?.UsuariosUnicos ?? 0,
+    peakHour: DataMediaAcessos?.HorarioPico ?? '-',
+    peakDay: DataMediaAcessos?.DiaMaisAtivo ?? '-',
+    AcessMedia: DataMediaAcessos?.MediaAcessos?? 0
   };
 
-  const weeklyData: AccessData[] = [
-    { period: 'Segunda-feira', totalAccess: 3245, uniqueUsers: 245, averagePerUser: 13.2 },
-    { period: 'Terça-feira', totalAccess: 4567, uniqueUsers: 298, averagePerUser: 15.3 },
-    { period: 'Quarta-feira', totalAccess: 3890, uniqueUsers: 267, averagePerUser: 14.6 },
-    { period: 'Quinta-feira', totalAccess: 4123, uniqueUsers: 289, averagePerUser: 14.3 },
-    { period: 'Sexta-feira', totalAccess: 3567, uniqueUsers: 234, averagePerUser: 15.2 },
-    { period: 'Sábado', totalAccess: 2845, uniqueUsers: 198, averagePerUser: 14.4 },
-    { period: 'Domingo', totalAccess: 2330, uniqueUsers: 167, averagePerUser: 13.9 }
-  ];
+  // Filtra itens nulos e transforma os dados para a tabela
+  const weeklyData: AccessData[] =DataMediaAcessos? DataMediaAcessos?.DistribuicaoAcessosPorDiaSemana
+    .filter((item): item is NonNullable<typeof item> => item != null)
+    .map((item) => ({
+      period: item.DiaSemana,
+      totalAccess: item.TotalAcessos,
+      uniqueUsers: item.UsuariosUnicos,
+      averagePerUser: item.MediaPorUsuario,
+    })):[];
 
   const columns: ColumnsType<AccessData> = [
     {
@@ -46,21 +55,22 @@ export function AccessModal({ isOpen, onClose, averageAccess, onExport }: Access
       dataIndex: 'totalAccess',
       key: 'totalAccess',
       align: 'right',
-      render: (value) => value.toLocaleString()
+      render: (value) => (value != null ? value.toLocaleString() : '-'),
     },
     {
       title: 'Usuários Únicos',
       dataIndex: 'uniqueUsers',
       key: 'uniqueUsers',
-      align: 'right'
+      align: 'right',
+      render: (value) => (value != null ? value : '-'),
     },
     {
       title: 'Média por Usuário',
       dataIndex: 'averagePerUser',
       key: 'averagePerUser',
       align: 'right',
-      render: (value) => `${value} acessos`
-    }
+      render: (value) => (value != null ? `${value} acessos` : '-'),
+    },
   ];
 
   return (
@@ -68,15 +78,17 @@ export function AccessModal({ isOpen, onClose, averageAccess, onExport }: Access
       title={
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '4px', height: '24px', background: 'linear-gradient(135deg, #eb2f96 0%, #f759ab 100%)', borderRadius: '2px' }} />
+            <div
+              style={{
+                width: '4px',
+                height: '24px',
+                background: 'linear-gradient(135deg, #eb2f96 0%, #f759ab 100%)',
+                borderRadius: '2px',
+              }}
+            />
             Média de Acessos - Detalhamento
           </div>
-          <Button 
-            type="default" 
-            icon={<DownloadOutlined />} 
-            onClick={onExport}
-            size="small"
-          >
+          <Button type="default" icon={<DownloadOutlined />} onClick={onExport} size="small">
             Exportar Dados
           </Button>
         </div>
@@ -131,7 +143,7 @@ export function AccessModal({ isOpen, onClose, averageAccess, onExport }: Access
           <Card title="Resumo Semanal" style={{ textAlign: 'center' }}>
             <BarChartOutlined style={{ fontSize: 48, color: '#eb2f96', marginBottom: 16 }} />
             <p style={{ fontSize: 16, marginBottom: 8 }}>
-              Média de <strong>{averageAccess}</strong> acessos por usuário
+              Média de <strong>{stats.AcessMedia}</strong> acessos por usuário
             </p>
             <p style={{ color: '#8c8c8c' }}>
               {stats.totalAccess.toLocaleString()} acessos totais no período
@@ -146,6 +158,9 @@ export function AccessModal({ isOpen, onClose, averageAccess, onExport }: Access
               rowKey="period"
               pagination={false}
               size="small"
+              locale={{
+                emptyText: 'Sem dados para o período selecionado',
+              }}
             />
           </Card>
         </Col>

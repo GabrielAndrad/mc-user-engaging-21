@@ -1,6 +1,28 @@
 class ApiService {
-  private baseURL = 'https://api-prod.meucliente.app.br/api';
+  private baseLocal = 'http://localhost:5009/api';
+  private baseProd = 'https://api-prod.meucliente.app.br';
+  private baseDev = 'https://api-dev.meucliente.app.br/api';
+  private baseKoch = 'https://api-koch.meucliente.app.br/api';
+  private baseHml = 'https://api-hml.meucliente.app.br';
   private accessToken: string | null = null;
+  
+  private get baseURL() {
+    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+    if (currentUrl.includes('localhost')) {
+      return this.baseLocal;
+    }
+    if (currentUrl.includes('koch')) {
+      return this.baseKoch;
+    }
+    if (currentUrl.includes('dev')) {
+      return this.baseDev;
+    }
+    if (currentUrl.includes('hml')) {
+      return this.baseHml;
+    }
+    // Default para produção
+    return this.baseProd;
+  }
 
   setAccessToken(token: string | null) {
     this.accessToken = token;

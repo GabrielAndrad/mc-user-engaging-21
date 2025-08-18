@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Layout, Typography, Space, message } from 'antd';
 import { FilterSection, FilterState } from '@/components/analytics/FilterSection';
-import { KPISection } from '@/components/analytics/KPISection';
+import { IndicadoresScreen, KPISection } from '@/components/analytics/KPISection';
 import { FunctionalityChart } from '@/components/analytics/FunctionalityChart';
 import { FunctionalityRanking } from '@/components/analytics/FunctionalityRanking';
 import { RetailRanking } from '@/components/analytics/RetailRanking';
@@ -98,13 +98,6 @@ const Index = () => {
     messageApi.success(`Dados da funcionalidade ${drilldownModal.functionality} exportados.`);
   };
 
-  const handleActiveUsersClick = () => {
-    const activeUsers = generateActiveUsersData();
-    setActiveUsersModal({
-      isOpen: true,
-      users: activeUsers
-    });
-  };
 
   const handleActiveUsersExport = () => {
     messageApi.success('Dados dos usuários ativos exportados.');
@@ -226,8 +219,6 @@ const Index = () => {
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <Space direction="vertical" size={32} style={{ width: '100%' }}>
 
-
-            {/* Filters */}
             <div style={{
               background: 'white',
               borderRadius: '16px',
@@ -235,97 +226,8 @@ const Index = () => {
               border: '1px solid #f1f5f9',
               overflow: 'hidden'
             }}>
-              <FilterSection
-                filters={filters}
-                onFiltersChange={setFilters}
-                onExport={handleExportCSV}
-              />
-            </div>
-
-            {/* KPIs */}
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-              border: '1px solid #f1f5f9',
-              overflow: 'hidden'
-            }}>
-              <KPISection 
-                data={kpiData} 
-                onActiveUsersClick={handleActiveUsersClick}
-                onNPSClick={() => setNPSModal(true)}
-                onAccessClick={() => setAccessModal(true)}
-                onFunctionalityClick={() => setFunctionalityModal(true)}
-                onRetailClick={() => setRetailModal(true)}
-              />
-            </div>
-
-            {/* Functionality Chart */}
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-              border: '1px solid #f1f5f9',
-              overflow: 'hidden'
-            }}>
-              <FunctionalityChart
-                data={functionalityData}
-                onDrilldown={handleFunctionalityDrilldown}
-              />
-            </div>
-
-            {/* Timeline Chart - Full Width */}
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-              border: '1px solid #f1f5f9',
-              overflow: 'hidden'
-            }}>
-              <TimelineChart data={timelineData} />
-            </div>
-
-            {/* Functionality Rankings */}
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-              border: '1px solid #f1f5f9',
-              overflow: 'hidden'
-            }}>
-              <FunctionalityRanking data={functionalityData} />
-            </div>
-
-
-            {/* User Type Rankings */}
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-              border: '1px solid #f1f5f9',
-              overflow: 'hidden'
-            }}>
-              <UserTypeRanking 
-                varejoData={varejoRankingData} 
-                industriaData={industriaRankingData}
-                photocheckData={photocheckRankingData}
-              />
-            </div>
-
-            {/* Users Table */}
-            <div style={{
-              background: 'white',
-              borderRadius: '16px',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-              border: '1px solid #f1f5f9',
-              overflow: 'hidden'
-            }}>
-              <UserTable
-                data={userData}
-                onExport={handleExportTable}
-              />
-            </div>
-
+              <IndicadoresScreen/>
+            </div> 
             {/* Drilldown Modal */}
             <DrilldownModal
               isOpen={drilldownModal.isOpen}
@@ -333,46 +235,6 @@ const Index = () => {
               functionality={drilldownModal.functionality}
               users={drilldownModal.users}
               onExport={handleDrilldownExport}
-            />
-
-            {/* Active Users Modal */}
-            <ActiveUsersModal
-              isOpen={activeUsersModal.isOpen}
-              onClose={() => setActiveUsersModal(prev => ({ ...prev, isOpen: false }))}
-              users={activeUsersModal.users}
-              onExport={handleActiveUsersExport}
-            />
-
-            {/* NPS Modal */}
-            <NPSModal
-              isOpen={npsModal}
-              onClose={() => setNPSModal(false)}
-              npsScore={kpiData.npsScore}
-              onExport={() => messageApi.success('Dados NPS exportados.')}
-            />
-
-            {/* Access Modal */}
-            <AccessModal
-              isOpen={accessModal}
-              onClose={() => setAccessModal(false)}
-              averageAccess={Math.round(kpiData.totalActiveUsers * 1.5)}
-              onExport={() => messageApi.success('Dados de acesso exportados.')}
-            />
-
-            {/* Functionality Modal */}
-            <FunctionalityModal
-              isOpen={functionalityModal}
-              onClose={() => setFunctionalityModal(false)}
-              functionality={kpiData.topFunctionality}
-              onExport={() => messageApi.success('Dados de funcionalidade exportados.')}
-            />
-
-            {/* Retail Modal */}
-            <RetailModal
-              isOpen={retailModal}
-              onClose={() => setRetailModal(false)}
-              retailName={kpiData.topAccount}
-              onExport={() => messageApi.success('Dados de varejo exportados.')}
             />
           </Space>
         </div>

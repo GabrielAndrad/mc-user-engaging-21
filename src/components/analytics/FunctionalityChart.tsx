@@ -1,6 +1,5 @@
-import { Card, Button, Typography } from 'antd';
+import { Card, Typography } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { EyeOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -31,24 +30,25 @@ export function FunctionalityChart({ data, onDrilldown }: FunctionalityChartProp
           <div style={{ marginBottom: '8px' }}>
             <Text strong>{label}</Text>
           </div>
-          {payload.map((entry: any, index: number) => (
-            <div key={index} style={{ marginBottom: '4px' }}>
-              <Text style={{ color: entry.color, fontSize: '12px' }}>
-                {entry.name}: {entry.value}
-                {entry.dataKey === 'tempoMedio' ? ' min' : 
-                 entry.dataKey === 'percentualUsuarios' ? '%' : ''}
-              </Text>
-            </div>
-          ))}
-          <Button 
-            size="small" 
-            type="dashed"
-            icon={<EyeOutlined />}
-            onClick={() => onDrilldown(label)}
-            style={{ marginTop: '8px', width: '100%' }}
-          >
-            Ver detalhes
-          </Button>
+          {payload.map((entry: any, index: number) => {
+            let value = entry.value;
+
+            if (entry.dataKey === 'tempoMedio') {
+              value = `${value.toLocaleString('pt-BR', { minimumFractionDigits: 0 })} min`;
+            } else if (entry.dataKey === 'percentualUsuarios') {
+              value = `${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}%`;
+            } else {
+              value = value.toLocaleString('pt-BR');
+            }
+
+            return (
+              <div key={index} style={{ marginBottom: '4px' }}>
+                <Text style={{ color: entry.color, fontSize: '12px' }}>
+                  {entry.name}: {value}
+                </Text>
+              </div>
+            );
+          })}
         </Card>
       );
     }
@@ -102,7 +102,7 @@ export function FunctionalityChart({ data, onDrilldown }: FunctionalityChartProp
       </ResponsiveContainer>
       <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f6f8fa', borderRadius: '6px' }}>
         <Text type="secondary" style={{ fontSize: '13px' }}>
-          💡 Clique em uma barra para ver detalhes dos usuários que utilizaram a funcionalidade
+          💡 Passe o mouse em cima da barra para ver os detalhes da funcionalidade
         </Text>
       </div>
     </Card>
