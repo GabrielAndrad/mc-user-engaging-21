@@ -8,7 +8,7 @@ import {
   StarOutlined
 } from '@ant-design/icons';
 import { createSafeStream } from '@/utils/stream-factory';
-import { EvolucaoDiaria, IndicadoresState, LoadComboMenu, LoadIndicadoresEngajamento, LoadUserDetalhe, openCloseActiveUsersModal, openCloseFuncionalidadeMaisAcessada, openCloseMediaAcesso, openCloseNpsModal, openCloseVarejoMaisEngajado, RankingVarejo, UtilizacaoPorFuncionalidade } from '@/Stores/Indicadores-store';
+import { EvolucaoDiaria, IndicadoresState, LoadComboMenu, LoadIndicadoresEngajamento, LoadIndicadoresAll, openCloseActiveUsersModal, openCloseFuncionalidadeMaisAcessada, openCloseMediaAcesso, openCloseNpsModal, openCloseVarejoMaisEngajado, RankingVarejo, updateValuesFilters, UtilizacaoPorFuncionalidade } from '@/Stores/Indicadores-store';
 import { plug } from 'luffie';
 import React, { useState } from 'react';
 import { FunctionalityData, generateActiveUsersData, generateDrilldownData, TimelineData } from '@/utils/mockData';
@@ -28,6 +28,7 @@ import { FunctionalityRanking } from './FunctionalityRanking';
 import { UserTypeRanking } from './UserTypeRanking';
 import { UserTable } from './UserTable';
 import { FilterSection } from './FilterSection';
+import { LoadIndicadores } from '@/services/Indicadores-service';
 
 const { Text } = Typography;
 
@@ -58,12 +59,22 @@ interface KPISectionProps {
   OpenMediaAcesso: boolean;
   DataMaisAcessada: MaisAcessada,
   OpenMaisAcessada: false,
-  Filters: any
+  ValuesFilters: any,
+  Combos: any,
+  IsloadingIndicadores?: boolean;
+  IsloadingEvolucaoDiaria?: boolean;
+  loadingNps?: boolean;
+  loadingMediaAcessos?: boolean;
+  IsloadingUtilizacaoPorFuncionalidade?: boolean;
+  IsloadingUsuariosAtivosDetalhes: boolean;
+  IsloadingRankingVarejo: boolean;
+  loadingVarejoMaisEngajado?: boolean;
 }
 
 export const KPISection: React.FC<KPISectionProps> = ({
   data,
   Isloading,
+  IsloadingIndicadores,
   OpenActiveUsersModal,
   DataNpsDetalhes,
   OpenNpsModal,
@@ -77,7 +88,12 @@ export const KPISection: React.FC<KPISectionProps> = ({
   DataUtilizacaoPorFuncionalidade,
   DataEvolucaoDiaria,
   DataRankingVarejo,
-  Filters
+  ValuesFilters,
+  Combos,
+  IsloadingRankingVarejo,
+  IsloadingUsuariosAtivosDetalhes,
+  IsloadingEvolucaoDiaria,
+  IsloadingUtilizacaoPorFuncionalidade,
 }) => {
 
   const kpis = [
@@ -148,15 +164,14 @@ export const KPISection: React.FC<KPISectionProps> = ({
 
   return (
     <div>
-      <Spin spinning={Isloading}>
-        <Row gutter={[12,
-          16]} justify="space-between" style={{ marginBottom: '12px', padding: '0 12px' }}>
-          <FilterSection
-            filters={Filters}
-            onFiltersChange={() => { } }
-            onExport={() => { } } 
-            Combos={Filters}          
-            />
+      <FilterSection
+        ValuesFilters={ValuesFilters}
+        onFiltersChange={updateValuesFilters}
+        onExport={() => { }}
+        Combos={Combos}
+      />
+      <Spin spinning={IsloadingIndicadores}>
+        <Row gutter={[12, 16]} justify="space-between" style={{ marginBottom: '12px',marginTop:'20px',padding: '0 12px' }}>
           {kpis.map((kpi, index) => (
             <Col flex="1" style={{ maxWidth: '19%' }} key={index}>
               <div style={{
@@ -258,63 +273,72 @@ export const KPISection: React.FC<KPISectionProps> = ({
       }}>
         💡 Clique no card para os detalhes da geração do indicador
       </div>
-
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }}>
-        <FunctionalityChart
-          data={chartData}
-          onDrilldown={() => { }}
-        />
-      </div>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }}>
-        <TimelineChart data={chartDataEvolucaoDiaria} />
-      </div>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }}>
-        <FunctionalityRanking data={chartData} />
-      </div>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }}>
-        <UserTypeRanking
-          varejoData={DataRankingVarejo && DataRankingVarejo.DataVarejo ? DataRankingVarejo.DataVarejo : []}
-          industriaData={null}
-          photocheckData={null}
-        />
-      </div>
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden'
-      }}>
-        <UserTable
-          data={DataUsuariosAtivosDetalhes}
-          comboFuncionalidade={Filters && Filters.ComboMenu}
-          onExport={() => message.success('Dados dos usuários ativos exportados.')}
-        />
-      </div>
+      <Spin spinning={IsloadingUtilizacaoPorFuncionalidade}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          border: '1px solid #f1f5f9',
+          overflow: 'hidden'
+        }}>
+          <FunctionalityChart
+            data={chartData}
+            onDrilldown={() => { }}
+          />
+        </div>
+      </Spin>
+      <Spin spinning={IsloadingEvolucaoDiaria}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          border: '1px solid #f1f5f9',
+          overflow: 'hidden'
+        }}>
+          <TimelineChart data={chartDataEvolucaoDiaria} />
+        </div>
+      </Spin>
+      <Spin spinning={IsloadingRankingVarejo}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          border: '1px solid #f1f5f9',
+          overflow: 'hidden'
+        }}>
+          <FunctionalityRanking data={chartData} />
+        </div>
+      </Spin>
+      <Spin spinning={IsloadingUtilizacaoPorFuncionalidade}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          border: '1px solid #f1f5f9',
+          overflow: 'hidden'
+        }}>
+          <UserTypeRanking
+            varejoData={DataRankingVarejo && DataRankingVarejo.DataVarejo ? DataRankingVarejo.DataVarejo : []}
+            industriaData={null}
+            photocheckData={null}
+          />
+        </div>
+      </Spin>
+      <Spin spinning={IsloadingUsuariosAtivosDetalhes}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          border: '1px solid #f1f5f9',
+          overflow: 'hidden'
+        }}>
+          <UserTable
+            data={DataUsuariosAtivosDetalhes}
+            comboFuncionalidade={Combos && Combos.funcionalidade}
+            onExport={() => message.success('Dados dos usuários ativos exportados.')}
+          />
+        </div>
+      </Spin>
 
       <ActiveUsersModal
         isOpen={OpenActiveUsersModal}
@@ -361,12 +385,7 @@ const stream = (props: any) => {
     // ✅ CARREGADORES INICIAIS
     initialLoaders: [
       () => {
-        LoadIndicadoresEngajamento();
-        UtilizacaoPorFuncionalidade();
-        EvolucaoDiaria();
-        RankingVarejo();
-        LoadUserDetalhe();
-        LoadComboMenu()
+        LoadIndicadoresAll()
       }
     ],
 
@@ -380,6 +399,7 @@ const stream = (props: any) => {
       // ✅ SEGURANÇA: Verificar se estado está definido
       const safeIndicadores = Indicadores || {};
 
+      // Aqui, extraímos os loadings individuais da store, se existirem
       return {
         ...safeIndicadores,
       };
@@ -394,7 +414,7 @@ const stream = (props: any) => {
       console.error('💰 [IndicadoresStream] Erro crítico:', error);
       // Em caso de erro, tentar recarregar dados básicos
       try {
-        LoadIndicadoresEngajamento();
+        LoadIndicadoresAll();
       } catch (reloadError) {
         console.error('💰 [IndicadoresStream] Falha ao recarregar centro de custo:', reloadError);
       }
