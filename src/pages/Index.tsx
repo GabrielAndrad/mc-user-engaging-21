@@ -36,11 +36,12 @@ const { Title, Text } = Typography;
 const Index = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [filters, setFilters] = useState<FilterState>({
-    dateRange: undefined,
-    userTypes: [],
-    functionality: '',
-    account: '',
-    nps: ''
+    dataInicio: new Date(),
+    dataFim: new Date(),
+    funcionalidade: [],
+    varejo: [],
+    Nps: [],
+    PeriodosRapidos: []
   });
   
   const [drilldownModal, setDrilldownModal] = useState<{
@@ -111,8 +112,25 @@ const Index = () => {
     
     setFilters(prev => ({
       ...prev,
-      dateRange: { from, to }
+      dataInicio: from,
+      dataFim: to
     }));
+    
+    // Listen for parent URL message
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin.includes("meucliente.app.br") && event.data?.parentUrl) {
+        console.log("URL do pai recebida:", event.data.parentUrl);
+      }
+    };
+    
+    window.addEventListener("message", handleMessage);
+    
+    // Request parent URL
+    window.parent.postMessage({ type: "REQUEST_PARENT_URL" }, "*");
+    
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
   }, []);
 
   return (
