@@ -190,7 +190,6 @@ const Index = () => {
         </div>
       </div>
 
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <Space direction="vertical" size={32} style={{ width: '100%' }}>
 
             <div style={{
@@ -211,7 +210,6 @@ const Index = () => {
               onExport={handleDrilldownExport}
             />
           </Space>
-        </div>
     </Layout>
   );
 };
