@@ -32,10 +32,6 @@ class ApiService {
       console.log('Usando baseLocal:', this.baseLocal);
       return this.baseLocal;
     }
-    if (currentUrl.includes('dashboard-lovable')) {
-      console.log('Usando baseProd para dashboard-lovable:', this.baseProd);
-      return this.baseProd;
-    }
     if (currentUrl.includes('koch')) {
       console.log('Usando baseKoch:', this.baseKoch);
       return this.baseKoch;
