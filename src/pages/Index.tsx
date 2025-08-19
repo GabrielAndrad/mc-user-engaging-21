@@ -190,44 +190,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div style={{ 
-        backgroundColor: 'white',
-        borderBottom: '1px solid #e2e8f0',
-        padding: '0 24px',
-        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ 
-            display: 'flex',
-            gap: '32px',
-            paddingTop: '20px',
-            paddingBottom: '4px'
-          }}>
-            <div style={{
-              padding: '12px 0',
-              borderBottom: '3px solid #3b82f6',
-              color: '#1e40af',
-              fontWeight: 600,
-              fontSize: '16px',
-              position: 'relative',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}>
-              Engajamento da Plataforma
-              <div style={{
-                position: 'absolute',
-                bottom: '-4px',
-                left: '0',
-                right: '0',
-                height: '3px',
-                background: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
-                borderRadius: '2px 2px 0 0'
-              }} />
-            </div>
-          </div>
-        </div>
-      </div>
 
       <Content style={{ 
         padding: '32px 24px',
