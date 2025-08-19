@@ -197,10 +197,13 @@ const Index = () => {
               borderRadius: '16px',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
               border: '1px solid #f1f5f9',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              position: 'sticky',
+              top: 0,
+              zIndex: 1000
             }}>
               <IndicadoresScreen/>
-            </div> 
+            </div>
             {/* Drilldown Modal */}
             <DrilldownModal
               isOpen={drilldownModal.isOpen}
