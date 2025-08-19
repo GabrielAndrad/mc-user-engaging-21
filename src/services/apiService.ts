@@ -5,22 +5,28 @@ class ApiService {
   private baseKoch = 'https://api-koch.meucliente.app.br/api';
   private baseHml = 'https://api-hml.meucliente.app.br';
   private accessToken: string | null = null;
-  
+
+  private parentUrl: string | null = null;
+
+  constructor() {
+    if (typeof window !== 'undefined') {
+      window.addEventListener("message", (event: MessageEvent) => {
+        // segurança: aceite só mensagens do domínio do pai
+        if (event.origin.includes("meucliente.app.br") && event.data?.parentUrl) {
+          this.parentUrl = event.data.parentUrl;
+          console.log("URL do pai recebida:", this.parentUrl);
+        }
+      });
+    }
+  }
+
   private get baseURL() {
-    const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
-    if (currentUrl.includes('localhost')) {
-      return this.baseLocal;
-    }
-    if (currentUrl.includes('koch')) {
-      return this.baseKoch;
-    }
-    if (currentUrl.includes('dev')) {
-      return this.baseDev;
-    }
-    if (currentUrl.includes('hml')) {
-      return this.baseHml;
-    }
-    // Default para produção
+    const currentUrl = this.parentUrl || window.location.href;
+
+    if (currentUrl.includes('localhost')) return this.baseLocal;
+    if (currentUrl.includes('koch')) return this.baseKoch;
+    if (currentUrl.includes('dev')) return this.baseDev;
+    if (currentUrl.includes('hml')) return this.baseHml;
     return this.baseProd;
   }
 
@@ -29,14 +35,10 @@ class ApiService {
   }
 
   private getHeaders(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
     if (this.accessToken) {
       headers.Authorization = `Bearer ${this.accessToken}`;
     }
-
     return headers;
   }
 
@@ -45,11 +47,7 @@ class ApiService {
       method: 'GET',
       headers: this.getHeaders(),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return response.json();
   }
 
@@ -59,11 +57,7 @@ class ApiService {
       headers: this.getHeaders(),
       body: data ? JSON.stringify(data) : undefined,
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return response.json();
   }
 
@@ -73,11 +67,7 @@ class ApiService {
       headers: this.getHeaders(),
       body: data ? JSON.stringify(data) : undefined,
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return response.json();
   }
 
@@ -86,11 +76,7 @@ class ApiService {
       method: 'DELETE',
       headers: this.getHeaders(),
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return response.json();
   }
 }
