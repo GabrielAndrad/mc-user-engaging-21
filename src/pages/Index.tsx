@@ -190,12 +190,6 @@ const Index = () => {
         </div>
       </div>
 
-
-      <Content style={{ 
-        padding: '32px 24px',
-        backgroundColor: '#f8fafc',
-        minHeight: 'calc(100vh - 140px)'
-      }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <Space direction="vertical" size={32} style={{ width: '100%' }}>
 
@@ -218,7 +212,6 @@ const Index = () => {
             />
           </Space>
         </div>
-      </Content>
     </Layout>
   );
 };
