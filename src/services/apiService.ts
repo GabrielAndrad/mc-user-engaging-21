@@ -10,16 +10,29 @@ class ApiService {
 
   constructor() {
     if (typeof window !== 'undefined') {
-      window.addEventListener("message", (event: MessageEvent) => {
-        // segurança: aceite só mensagens do domínio do pai
-        if (event.origin.includes("meucliente.app.br") && event.data?.parentUrl) {
-          this.parentUrl = event.data.parentUrl;
-          console.log("URL do pai recebida no apiService:", this.parentUrl);
-        }
-      });
+      // Verifica se está em iframe
+      const isInIframe = window !== window.parent;
       
-      // Solicita a URL do pai quando o serviço é inicializado
-      window.parent.postMessage({ type: "REQUEST_PARENT_URL" }, "*");
+      if (isInIframe) {
+        // Se está em iframe, captura a URL do pai através do referrer
+        this.parentUrl = document.referrer;
+        console.log("URL do pai capturada via referrer:", this.parentUrl);
+        
+        // Também escuta mensagens do pai caso seja enviada explicitamente
+        window.addEventListener("message", (event: MessageEvent) => {
+          if (event.origin.includes("meucliente.app.br") && event.data?.parentUrl) {
+            this.parentUrl = event.data.parentUrl;
+            console.log("URL do pai atualizada via postMessage:", this.parentUrl);
+          }
+        });
+        
+        // Solicita a URL do pai
+        window.parent.postMessage({ type: "REQUEST_PARENT_URL" }, "*");
+      } else {
+        // Se não está em iframe, usa a URL atual
+        this.parentUrl = window.location.href;
+        console.log("Usando URL atual (não está em iframe):", this.parentUrl);
+      }
     }
   }
 
