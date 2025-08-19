@@ -14,19 +14,38 @@ class ApiService {
         // segurança: aceite só mensagens do domínio do pai
         if (event.origin.includes("meucliente.app.br") && event.data?.parentUrl) {
           this.parentUrl = event.data.parentUrl;
-          console.log("URL do pai recebida:", this.parentUrl);
+          console.log("URL do pai recebida no apiService:", this.parentUrl);
         }
       });
+      
+      // Solicita a URL do pai quando o serviço é inicializado
+      window.parent.postMessage({ type: "REQUEST_PARENT_URL" }, "*");
     }
   }
 
   private get baseURL() {
     const currentUrl = this.parentUrl || window.location.href;
+    
+    console.log('Determinando baseURL a partir de:', currentUrl);
 
-    if (currentUrl.includes('localhost')) return this.baseLocal;
-    if (currentUrl.includes('koch')) return this.baseKoch;
-    if (currentUrl.includes('dev')) return this.baseDev;
-    if (currentUrl.includes('hml')) return this.baseHml;
+    if (currentUrl.includes('localhost')) {
+      console.log('Usando baseLocal:', this.baseLocal);
+      return this.baseLocal;
+    }
+    if (currentUrl.includes('koch')) {
+      console.log('Usando baseKoch:', this.baseKoch);
+      return this.baseKoch;
+    }
+    if (currentUrl.includes('dev')) {
+      console.log('Usando baseDev:', this.baseDev);
+      return this.baseDev;
+    }
+    if (currentUrl.includes('hml')) {
+      console.log('Usando baseHml:', this.baseHml);
+      return this.baseHml;
+    }
+    
+    console.log('Usando baseProd (default):', this.baseProd);
     return this.baseProd;
   }
 
