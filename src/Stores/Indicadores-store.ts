@@ -182,12 +182,14 @@ const LoadUserDetalhe = (params) => {
     createManagedSubscription(
         LoadUsuarioAtivosDetalhes(Itens),
         (response: UsuarioAtivoEngajamento[]) => {
+
             const responseOrdenado = [...response].sort((a, b) => {
                 if (a.Nome && b.Nome) {
                     return a.Nome.localeCompare(b.Nome, 'pt-BR', { sensitivity: 'base' });
                 }
                 return 0;
             });
+            
             updateState({ DataUsuariosAtivosDetalhes: responseOrdenado, IsloadingUsuariosAtivosDetalhes: false})
         }, (error) => {
             message.error('Erro ao carregar Indicadores');
