@@ -88,7 +88,8 @@ const { createManagedSubscription, cleanupStoreSubscriptions, getStoreStats } =
     createAndRegisterManagedStore('IndicadoresStore');
 
 
-const openCloseActiveUsersModal = (value) => { const { ValuesFilters } = getCurrentState();
+const openCloseActiveUsersModal = (value) => { 
+    const { ValuesFilters } = getCurrentState();
     const params = ValuesFilters;
 
     // Função para garantir o formato yyyy-mm-dd
@@ -134,7 +135,14 @@ const openCloseActiveUsersModal = (value) => { const { ValuesFilters } = getCurr
         createManagedSubscription(
             LoadUsuarioAtivosDetalhes(Itens),
             (response: UsuarioAtivoEngajamento[]) => {
-                updateState({ DataUsuariosAtivosDetalhes: response, IsloadingIndicadores: false, OpenActiveUsersModal: value })
+
+                const responseOrdenado = [...response].sort((a, b) => {
+                    if (a.Nome && b.Nome) {
+                        return a.Nome.localeCompare(b.Nome, 'pt-BR', { sensitivity: 'base' });
+                    }
+                    return 0;
+                });
+                updateState({ DataUsuariosAtivosDetalhes: responseOrdenado, IsloadingIndicadores: false, OpenActiveUsersModal: value })
             }, (error) => {
                 message.error('Erro ao carregar Indicadores');
                 updateState({ DataUsuariosAtivosDetalhes: [], IsloadingIndicadores: false })
@@ -143,7 +151,6 @@ const openCloseActiveUsersModal = (value) => { const { ValuesFilters } = getCurr
     } else {
         updateState({ OpenActiveUsersModal: value })
     }
-
 }
 
 const LoadUserDetalhe = (params) => {
