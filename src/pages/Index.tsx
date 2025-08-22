@@ -29,6 +29,7 @@ import {
   generateActiveUsersData,
   UserData
 } from '@/utils/mockData';
+import { exportToExcel, exportMultipleSheets } from '@/utils/excelExport';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -79,11 +80,46 @@ const Index = () => {
   const [photocheckRankingData] = useState(() => generatePhotocheckRankingData());
 
   const handleExportCSV = () => {
-    messageApi.success('Os dados filtrados estão sendo exportados para CSV.');
+    try {
+      // Export dashboard data with multiple sheets
+      const sheets = [
+        { name: 'KPIs', data: [kpiData] },
+        { name: 'Funcionalidades', data: functionalityData },
+        { name: 'Timeline', data: timelineData },
+        { name: 'Varejo', data: retailData },
+        { name: 'Rankings_Varejo', data: varejoRankingData },
+        { name: 'Rankings_Industria', data: industriaRankingData },
+        { name: 'Rankings_PhotoCheck', data: photocheckRankingData }
+      ];
+      
+      exportMultipleSheets(sheets, 'dashboard_completo');
+      messageApi.success('Dashboard exportado para Excel com sucesso!');
+    } catch (error) {
+      messageApi.error('Erro ao exportar dados para Excel.');
+    }
   };
 
   const handleExportTable = () => {
-    messageApi.success('A tabela de usuários foi exportada com sucesso.');
+    try {
+      const exportData = userData.map(user => ({
+        'Nome': user.name,
+        'Email': user.email,
+        'Tipo': user.type,
+        'Conta': user.account,
+        'Total de Acessos': user.totalAccess,
+        'Último Acesso': user.lastAccess,
+        'Funcionalidade': user.functionality,
+        'Tempo Total (min)': user.totalTime,
+        'Tempo Médio (min)': user.averageTime,
+        'NPS': user.nps,
+        'Categoria NPS': user.npsCategory
+      }));
+      
+      exportToExcel(exportData, { filename: 'tabela_usuarios', sheetName: 'Usuários' });
+      messageApi.success('Tabela de usuários exportada para Excel!');
+    } catch (error) {
+      messageApi.error('Erro ao exportar tabela de usuários.');
+    }
   };
 
   const handleFunctionalityDrilldown = (functionality: string) => {
@@ -96,12 +132,45 @@ const Index = () => {
   };
 
   const handleDrilldownExport = () => {
-    messageApi.success(`Dados da funcionalidade ${drilldownModal.functionality} exportados.`);
+    try {
+      const exportData = drilldownModal.users.map(user => ({
+        'Nome do Usuário': user.Name,
+        'E-mail': user.email,
+        'Tipo': user.type,
+        'Conta (varejo)': user.account,
+        'Sessões': user.sessions,
+        'Tempo Total (min)': user.totalTime,
+        'Tempo Médio (min)': user.averageTime,
+        'Último Acesso': user.lastAccess
+      }));
+      
+      exportToExcel(exportData, { 
+        filename: `drilldown_${drilldownModal.functionality.toLowerCase().replace(/\s+/g, '_')}`, 
+        sheetName: 'Detalhes da Funcionalidade' 
+      });
+      messageApi.success(`Dados da funcionalidade ${drilldownModal.functionality} exportados para Excel!`);
+    } catch (error) {
+      messageApi.error('Erro ao exportar dados de drilldown.');
+    }
   };
 
-
   const handleActiveUsersExport = () => {
-    messageApi.success('Dados dos usuários ativos exportados.');
+    try {
+      const activeUsers = generateActiveUsersData();
+      const exportData = activeUsers.map(user => ({
+        'Nome': user.name,
+        'E-mail': user.email,
+        'Conta': user.account,
+        'Funcionalidade': user.functionality,
+        'Total de Acessos': user.totalAccess,
+        'Último Acesso': user.lastAccess
+      }));
+      
+      exportToExcel(exportData, { filename: 'usuarios_ativos', sheetName: 'Usuários Ativos' });
+      messageApi.success('Dados dos usuários ativos exportados para Excel!');
+    } catch (error) {
+      messageApi.error('Erro ao exportar dados de usuários ativos.');
+    }
   };
 
   useEffect(() => {
