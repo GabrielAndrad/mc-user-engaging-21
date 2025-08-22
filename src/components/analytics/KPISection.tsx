@@ -29,6 +29,14 @@ import { UserTypeRanking } from './UserTypeRanking';
 import { UserTable } from './UserTable';
 import { FilterSection } from './FilterSection';
 import { LoadIndicadores } from '@/services/Indicadores-service';
+import { exportDashboardData } from '@/utils/excelExport';
+import { 
+  createUserTableExportHandler,
+  createNPSExportHandler, 
+  createAccessExportHandler,
+  createRetailExportHandler,
+  createFunctionalityExportHandler
+} from '@/utils/modalExportHandlers';
 
 const { Text } = Typography;
 
@@ -95,6 +103,50 @@ export const KPISection: React.FC<KPISectionProps> = ({
   IsloadingEvolucaoDiaria,
   IsloadingUtilizacaoPorFuncionalidade,
 }) => {
+
+  const handleExportDashboard = () => {
+    try {
+      // Mock data for dashboard export - in real app, this would use actual data
+      const mockKpiData = {
+        totalActiveUsers: DataUsuariosAtivosDetalhes?.length || 0,
+        activeUsersPercentage: 75,
+        averageSessionTime: 23,
+        topFunctionality: DataMaisAcessada?.MaisAcessada || 'PhotoCheck',
+        topAccount: data.topAccount,
+        npsScore: DataNpsDetalhes?.npsScore || 67,
+        totalUsers: 1500
+      };
+      
+      const mockFunctionalityData = DataMaisAcessada ? [{
+        name: DataMaisAcessada.MaisAcessada || 'Funcionalidade',
+        acessos: DataMaisAcessada.TotalAcessos || 0,
+        tempoMedio: 25,
+        percentualUsuarios: 65
+      }] : [];
+      
+      const mockTimelineData = Array.from({ length: 30 }, (_, i) => ({
+        date: new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        acessos: Math.floor(Math.random() * 100) + 50,
+        varejo: Math.floor(Math.random() * 50) + 20,
+        industria: Math.floor(Math.random() * 30) + 10,
+        photocheck: Math.floor(Math.random() * 20) + 5
+      }));
+      
+      const mockRetailData = DataVarejoMaisEngajado ? [{
+        name: data.topAccount,
+        totalAccess: DataVarejoMaisEngajado.TotalUsuarios || 0,
+        averageTime: 25,
+        userPercentage: 65,
+        engagementScore: DataVarejoMaisEngajado.TaxaEngajamento || 0,
+        growth: 15
+      }] : [];
+      
+      exportDashboardData(mockKpiData, mockFunctionalityData, mockTimelineData, mockRetailData);
+      message.success('Dashboard exportado para Excel com sucesso!');
+    } catch (error) {
+      message.error('Erro ao exportar dados do dashboard.');
+    }
+  };
 
   const kpis = [
     {
@@ -167,7 +219,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
       <FilterSection
         ValuesFilters={ValuesFilters}
         onFiltersChange={updateValuesFilters}
-        onExport={() => { }}
+        onExport={handleExportDashboard}
         Combos={Combos}
       />
       <Spin spinning={IsloadingIndicadores}>
@@ -335,7 +387,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
           <UserTable
             data={DataUsuariosAtivosDetalhes}
             comboFuncionalidade={Combos && Combos.funcionalidade}
-            onExport={() => message.success('Dados dos usuários ativos exportados.')}
+            onExport={createUserTableExportHandler(DataUsuariosAtivosDetalhes)}
           />
         </div>
       </Spin>
@@ -344,27 +396,27 @@ export const KPISection: React.FC<KPISectionProps> = ({
         isOpen={OpenActiveUsersModal}
         onClose={() => openCloseActiveUsersModal(false)}
         users={DataUsuariosAtivosDetalhes}
-        onExport={() => message.success('Dados dos usuários ativos exportados.')}
+            onExport={createUserTableExportHandler(DataUsuariosAtivosDetalhes)}
       />
       <NPSModal
         isOpen={OpenNpsModal}
         onClose={() => openCloseNpsModal(false)}
         npsDetails={DataNpsDetalhes}
-        onExport={() => message.success('Dados NPS exportados.')}
+        onExport={createNPSExportHandler(DataNpsDetalhes)}
       />
 
       <RetailModal
         isOpen={OpenVarejoMaisEngajado}
         onClose={() => openCloseVarejoMaisEngajado(false)}
         retailName={{ ...DataVarejoMaisEngajado, VarejoName: data.topAccount }}
-        onExport={() => message.success('Dados de varejo exportados.')}
+        onExport={createRetailExportHandler(data.topAccount)}
       />
 
       <AccessModal
         isOpen={OpenMediaAcesso}
         onClose={() => openCloseMediaAcesso(false)}
         averageAccess={Math.round(DataMediaAcessos && DataMediaAcessos.UsuariosUnicos * 1.5)}
-        onExport={() => message.success('Dados de acesso exportados.')}
+        onExport={createAccessExportHandler(DataMediaAcessos)}
         DataMediaAcessos={DataMediaAcessos}
       />
 
@@ -372,7 +424,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
         isOpen={OpenMaisAcessada}
         onClose={() => openCloseFuncionalidadeMaisAcessada(false)}
         functionality={DataMaisAcessada}
-        onExport={() => message.success('Dados de funcionalidade exportados.')}
+        onExport={createFunctionalityExportHandler(DataMaisAcessada)}
       />
     </div>
   );
