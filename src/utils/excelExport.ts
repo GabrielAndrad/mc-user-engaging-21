@@ -31,6 +31,7 @@ export const exportToExcel = (data: any[], options: ExcelExportOptions = {}) => 
   const finalFilename = `${filename}_${timestamp}.xlsx`;
   
   XLSX.writeFile(wb, finalFilename);
+  alert(JSON.stringify(data));
 };
 
 // Export to CSV
@@ -173,6 +174,7 @@ export const exportUserTableData = (userData: any[]) => {
     'Total de Acessos': user.TotalAcesso,
     'Último Acesso': user.UltimoAcesso
   }));
+  alert(JSON.stringify(exportData));
   
   exportToExcel(exportData, { filename: 'tabela_usuarios', sheetName: 'Usuários' });
 };
