@@ -130,6 +130,11 @@ export function UserTable({ data, onExport,comboFuncionalidade }: UserTableProps
             placeholder="Todas funcionalidades"
             style={{ width: 200 }}
             allowClear
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
+            }
           >
             {comboFuncionalidade? comboFuncionalidade.map(func => (
               <Select.Option key={func.MenuId} value={func.MenuId}>{func.Nome}</Select.Option>

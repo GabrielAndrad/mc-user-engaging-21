@@ -104,6 +104,11 @@ export function FilterSection({
               placeholder="Todas as funcionalidades"
               style={{ width: '100%' }}
               allowClear
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
             >
               {Combos && Combos.funcionalidade?Combos.funcionalidade.map(func => (
                 <Select.Option key={func.MenuId} value={func.MenuId}>{func.Nome}</Select.Option>
@@ -122,6 +127,11 @@ export function FilterSection({
               style={{ width: '100%' }}
               allowClear
               loading={loadingClientes}
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
             >
               {clientes.map(cliente => (
                 <Select.Option key={cliente.ClienteId} value={cliente.ClienteId.toString()}>
@@ -141,6 +151,11 @@ export function FilterSection({
               placeholder="Todos os tipos"
               style={{ width: '100%' }}
               allowClear
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
             >
               {NPS_OPTIONS.map(option => (
                 <Select.Option key={option.value} value={option.value}>{option.label}</Select.Option>

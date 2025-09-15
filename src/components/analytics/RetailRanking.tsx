@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Trophy, Star } from 'lucide-react';
@@ -64,19 +65,19 @@ export function RetailRanking({ data }: RetailRankingProps) {
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-muted-foreground">Varejo:</label>
-            <Select value={filterRetail} onValueChange={setFilterRetail}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Todos os varejos" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os varejos</SelectItem>
-                {data.map(retail => (
-                  <SelectItem key={retail.id} value={retail.id}>
-                    {retail.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <SearchableSelect
+              value={filterRetail}
+              onValueChange={setFilterRetail}
+              placeholder="Todos os varejos"
+              className="w-48"
+              items={[
+                { value: 'all', label: 'Todos os varejos' },
+                ...data.map(retail => ({
+                  value: retail.id,
+                  label: retail.name
+                }))
+              ]}
+            />
           </div>
 
           <div className="flex items-center gap-2">
