@@ -1,6 +1,7 @@
 import { Modal, Statistic, Card, Row, Col, Button, Progress, Tag, Table, Input } from 'antd';
 import { DownloadOutlined, SearchOutlined, StarOutlined } from '@ant-design/icons';
 import { NpsDetalhes } from '@/interface/Nps';
+import { parseDecimalValue } from '@/utils/numberUtils';
 
 interface NPSModalProps {
   isOpen: boolean;
@@ -107,7 +108,7 @@ export function NPSModal({ isOpen, onClose, npsDetails, onExport }: NPSModalProp
             <Card style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <Statistic
                 title="Taxa de Resposta"
-                value={npsDetails && npsDetails.responseRate}
+                value={npsDetails && parseDecimalValue(npsDetails.responseRate)}
                 precision={1}
                 suffix="%"
                 valueStyle={{ color: '#52c41a' }}

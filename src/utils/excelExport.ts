@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { parseDecimalValue } from './numberUtils';
 
 export interface ExcelExportOptions {
   filename?: string;
@@ -181,7 +182,7 @@ export const exportNPSData = (npsDetails: any) => {
   const summaryData = [{
     'Score NPS': npsDetails.npsScore,
     'Total de Respostas': npsDetails.TotalResponses,
-    'Taxa de Resposta (%)': npsDetails.responseRate,
+    'Taxa de Resposta (%)': parseDecimalValue(npsDetails.responseRate),
     'Promotores': npsDetails.Promoters,
     'Neutros': npsDetails.Passives,
     'Detratores': npsDetails.Detractors,
