@@ -49,6 +49,10 @@ class ApiService {
       console.log('Usando baseKoch:', this.baseKoch);
       return this.baseKoch;
     }
+    if (currentUrl.includes('stage')) {
+      console.log('Usando baseDev (stage):', this.baseDev);
+      return this.baseDev;
+    }
     if (currentUrl.includes('dev')) {
       console.log('Usando baseDev:', this.baseDev);
       return this.baseDev;
