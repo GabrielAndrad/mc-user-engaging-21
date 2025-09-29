@@ -1,9 +1,9 @@
 class ApiService {
   private baseLocal = 'http://localhost:5009/api';
-  private baseProd = 'https://api-prod.meucliente.app.br';
+  private baseProd = 'https://api-prod.meucliente.app.br/api';
   private baseDev = 'https://api-dev.meucliente.app.br/api';
   private baseKoch = 'https://api-koch.meucliente.app.br/api';
-  private baseHml = 'https://api-hml.meucliente.app.br';
+  private baseHml = 'https://api-hml.meucliente.app.br/api';
   private accessToken: string | null = null;
 
   private parentUrl: string | null = null;
