@@ -175,19 +175,29 @@ export function FilterSection({
         <Col xs={24} sm={12} md={6} lg={4}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>CS Responsável</Typography.Text>
-            <Input
-              value={ValuesFilters.csResponsavel || ''}
-              onChange={(e) => onFiltersChange('csResponsavel', e.target.value)}
-              placeholder="Nome do CS..."
+            <Select
+              value={ValuesFilters.csResponsavel}
+              onChange={(value) => onFiltersChange('csResponsavel', value)}
+              placeholder="Selecionar CS..."
               style={{ width: '100%' }}
               allowClear
-            />
+              showSearch
+              loading={Combos?.loadingCsResponsavel}
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {Combos && Combos.csResponsavel ? Combos.csResponsavel.map((cs: any) => (
+                <Select.Option key={cs.Id} value={cs.Id}>{cs.Nome}</Select.Option>
+              )) : []}
+            </Select>
           </Space>
         </Col>
 
         <Col xs={24} sm={12} md={6} lg={4}>
           <Space direction="vertical" style={{ width: '100%' }}>
-            <Typography.Text strong>Segmento</Typography.Text>
+            <Typography.Text strong>Tipo de Cliente</Typography.Text>
             <Select
               value={ValuesFilters.segmento}
               onChange={(value) => onFiltersChange('segmento', value)}
