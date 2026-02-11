@@ -91,6 +91,8 @@ export function RetailRanking({ data }: RetailRankingProps) {
                 <SelectItem value="10">10</SelectItem>
                 <SelectItem value="15">15</SelectItem>
                 <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value={data.length.toString()}>Todos</SelectItem>
               </SelectContent>
             </Select>
           </div>
