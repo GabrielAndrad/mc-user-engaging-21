@@ -28,6 +28,7 @@ import { FunctionalityRanking } from './FunctionalityRanking';
 import { UserTypeRanking } from './UserTypeRanking';
 import { UserTable } from './UserTable';
 import { FilterSection } from './FilterSection';
+import { OperationalMetrics, OperationalMetricsData } from './OperationalMetrics';
 import { LoadIndicadores } from '@/services/Indicadores-service';
 import { exportDashboardData } from '@/utils/excelExport';
 import { 
@@ -315,6 +316,24 @@ export const KPISection: React.FC<KPISectionProps> = ({
           ))}
         </Row>
       </Spin>
+
+      {/* Operational Metrics */}
+      <div style={{
+        background: 'white',
+        borderRadius: '16px',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        border: '1px solid #f1f5f9',
+        overflow: 'hidden',
+        marginBottom: '12px'
+      }}>
+        <OperationalMetrics data={{
+          contratos: 1245,
+          execucoes: 8732,
+          produtos: 3891,
+          tarefas: 5620,
+          inventariosAlterados: 947,
+        }} />
+      </div>
 
       <div style={{
         textAlign: 'center',
