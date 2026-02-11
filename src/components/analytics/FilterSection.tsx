@@ -189,7 +189,7 @@ export function FilterSection({
               }
             >
               {Combos && Combos.csResponsavel ? Combos.csResponsavel.map((cs: any) => (
-                <Select.Option key={cs.id} value={cs.id}>{cs.nome}</Select.Option>
+                <Select.Option key={cs.id || cs.Id} value={cs.id || cs.Id}>{cs.nome || cs.Nome}</Select.Option>
               )) : []}
             </Select>
           </Space>
