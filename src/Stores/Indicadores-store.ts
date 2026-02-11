@@ -135,7 +135,7 @@ const openCloseActiveUsersModal = (value) => {
         Funcionalidade: params && params.funcionalidade ? [params.funcionalidade] : [],
         Varejo: params && params.varejo ? [params.varejo] : [],
         Nps: params && params.Nps ? [params.Nps] : [],
-        CsResponsavel: params?.csResponsavel || null,
+        usuarioId: params?.csResponsavel || null,
         TipoClienteId: params?.segmento || null
     };
     if (!!value) {
@@ -184,7 +184,7 @@ const LoadUserDetalhe = (params) => {
         Funcionalidade: params && params.Funcionalidade ? params.Funcionalidade : [],
         Varejo: params && params.Varejo ? params.Varejo : [],
         Nps: params && params.Nps ? params.Nps : [],
-        CsResponsavel: params?.CsResponsavel || null,
+        usuarioId: params?.usuarioId || null,
         TipoClienteId: params?.TipoClienteId || null
     }
 
@@ -250,7 +250,7 @@ const openCloseNpsModal = (value) => {
         Funcionalidade: params && params.funcionalidade ? [params.funcionalidade] : [],
         Varejo: params && params.varejo ? [params.varejo] : [],
         Nps: params && params.Nps ? [params.Nps] : [],
-        CsResponsavel: params?.csResponsavel || null,
+        usuarioId: params?.csResponsavel || null,
         TipoClienteId: params?.segmento || null
     };
     if (!!value) {
@@ -325,7 +325,7 @@ const openCloseVarejoMaisEngajado = (value) => {
         Funcionalidade: params && params.funcionalidade ? [params.funcionalidade] : [],
         Varejo: params && params.varejo ? [params.varejo] : [],
         Nps: params && params.Nps ? [params.Nps] : [],
-        CsResponsavel: params?.csResponsavel || null,
+        usuarioId: params?.csResponsavel || null,
         TipoClienteId: params?.segmento || null
     };
     if (!!value) {
@@ -385,7 +385,7 @@ const openCloseMediaAcesso = (value) => {
         Funcionalidade: params && params.funcionalidade ? [params.funcionalidade] : [],
         Varejo: params && params.varejo ? [params.varejo] : [],
         Nps: params && params.Nps ? [params.Nps] : [],
-        CsResponsavel: params?.csResponsavel || null,
+        usuarioId: params?.csResponsavel || null,
         TipoClienteId: params?.segmento || null
     };
     if (!!value) {
@@ -445,7 +445,7 @@ const openCloseFuncionalidadeMaisAcessada = (value) => {
         Funcionalidade: params && params.funcionalidade ? [params.funcionalidade] : [],
         Varejo: params && params.varejo ? [params.varejo] : [],
         Nps: params && params.Nps ? [params.Nps] : [],
-        CsResponsavel: params?.csResponsavel || null,
+        usuarioId: params?.csResponsavel || null,
         TipoClienteId: params?.segmento || null
     };
     if (!!value) {
@@ -601,7 +601,7 @@ const LoadIndicadoresAll = () => {
         Funcionalidade: params && params.funcionalidade ? [params.funcionalidade] : [],
         Varejo: params && params.varejo ? [params.varejo] : [],
         Nps: params && params.Nps ? [params.Nps] : [],
-        CsResponsavel: params?.csResponsavel || null,
+        usuarioId: params?.csResponsavel || null,
         TipoClienteId: params?.segmento || null
     };
 

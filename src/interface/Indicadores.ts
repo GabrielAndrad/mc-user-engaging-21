@@ -4,6 +4,6 @@ export interface Indicadores{
     Funcionalidade: number[];
     Varejo: number[];
     Nps: number[];
-    CsResponsavel?: string | null;
+    usuarioId?: number | string | null;
     TipoClienteId?: number | null;
   }
