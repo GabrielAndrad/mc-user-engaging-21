@@ -108,7 +108,7 @@ export function FilterSection({
             <Typography.Text strong>Funcionalidade</Typography.Text>
             <Select
               value={ValuesFilters.funcionalidade}
-              onChange={(value) => onFiltersChange('funcionalidade',value)}
+              onChange={(value) => onFiltersChange('funcionalidade', value ?? null)}
               placeholder="Todas as funcionalidades"
               style={{ width: '100%' }}
               allowClear
@@ -130,8 +130,8 @@ export function FilterSection({
             <Typography.Text strong>Varejo</Typography.Text>
             <Select
               value={ValuesFilters.varejo}
-              onChange={(value) => onFiltersChange('varejo',value)}
-              placeholder="Selecionar conta..."
+              onChange={(value) => onFiltersChange('varejo', value ?? null)}
+              placeholder="Todos"
               style={{ width: '100%' }}
               allowClear
               loading={loadingClientes}
@@ -155,8 +155,8 @@ export function FilterSection({
             <Typography.Text strong>NPS</Typography.Text>
             <Select
               value={ValuesFilters.Nps}
-              onChange={(value) => onFiltersChange('Nps',value)}
-              placeholder="Todos os tipos"
+              onChange={(value) => onFiltersChange('Nps', value ?? null)}
+              placeholder="Todos"
               style={{ width: '100%' }}
               allowClear
               showSearch
@@ -177,7 +177,7 @@ export function FilterSection({
             <Typography.Text strong>CS Responsável</Typography.Text>
             <Select
               value={ValuesFilters.csResponsavel}
-              onChange={(value) => onFiltersChange('csResponsavel', value)}
+              onChange={(value) => onFiltersChange('csResponsavel', value ?? null)}
               placeholder="Todos"
               style={{ width: '100%' }}
               allowClear
@@ -200,7 +200,7 @@ export function FilterSection({
             <Typography.Text strong>Tipo de Cliente</Typography.Text>
             <Select
               value={ValuesFilters.segmento}
-              onChange={(value) => onFiltersChange('segmento', value)}
+              onChange={(value) => onFiltersChange('segmento', value ?? null)}
               placeholder="Todos"
               style={{ width: '100%' }}
               allowClear
