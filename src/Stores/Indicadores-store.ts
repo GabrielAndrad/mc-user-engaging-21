@@ -536,10 +536,14 @@ const LoadCsResponsaveis = () => {
     createManagedSubscription(
         LoadResponsaveisCs(),
         (response) => {
+            console.log('CS Responsáveis response:', response);
+            const data = Array.isArray(response) ? response : (response?.data || response?.items || []);
             const currentCombos = getCurrentState().Combos || {} as any;
-            updateState({ Combos: {...currentCombos, csResponsavel: response, loadingCsResponsavel: false} as any })
+            updateState({ Combos: {...currentCombos, csResponsavel: data, loadingCsResponsavel: false} as any })
         }, (error) => {
             console.error('Erro ao carregar CS Responsáveis', error);
+            const currentCombos = getCurrentState().Combos || {} as any;
+            updateState({ Combos: {...currentCombos, csResponsavel: [], loadingCsResponsavel: false} as any })
         }
     )
 }
