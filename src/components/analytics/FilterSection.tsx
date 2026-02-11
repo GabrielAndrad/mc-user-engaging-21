@@ -18,6 +18,8 @@ export interface FilterState {
   varejo: number[];
   Nps: number[];
   PeriodosRapidos: number[];
+  csResponsavel?: string;
+  segmento?: string;
 }
 
 interface FilterSectionProps {
@@ -43,6 +45,12 @@ const NPS_OPTIONS = [
   { value: 1, label: 'Promotores (9-10)' },
   { value: 2, label: 'Neutros (7-8)' },
   { value: 3, label: 'Detratores (0-6)' },
+];
+
+const SEGMENTO_OPTIONS = [
+  { value: 'SMB', label: 'SMB' },
+  { value: 'ENTERPRISE', label: 'Enterprise' },
+  { value: 'CRIALED', label: 'Crialed' },
 ];
 
 export function FilterSection({
@@ -163,6 +171,37 @@ export function FilterSection({
             </Select>
           </Space>
         </Col>
+
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Typography.Text strong>CS Responsável</Typography.Text>
+            <Input
+              value={ValuesFilters.csResponsavel || ''}
+              onChange={(e) => onFiltersChange('csResponsavel', e.target.value)}
+              placeholder="Nome do CS..."
+              style={{ width: '100%' }}
+              allowClear
+            />
+          </Space>
+        </Col>
+
+        <Col xs={24} sm={12} md={6} lg={4}>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Typography.Text strong>Segmento</Typography.Text>
+            <Select
+              value={ValuesFilters.segmento}
+              onChange={(value) => onFiltersChange('segmento', value)}
+              placeholder="Todos os segmentos"
+              style={{ width: '100%' }}
+              allowClear
+            >
+              {SEGMENTO_OPTIONS.map(option => (
+                <Select.Option key={option.value} value={option.value}>{option.label}</Select.Option>
+              ))}
+            </Select>
+          </Space>
+        </Col>
+
         <Col span={1}>
         <Button
               type="link"
