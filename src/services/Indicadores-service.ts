@@ -156,3 +156,16 @@ export const ComboMenu= (): Observable<any> => {
             });
     });
 }
+
+export const LoadResponsaveisCs = (): Observable<any> => {
+    return new Observable((observer) => {
+        apiService.get('/Usuario/responsaveis-cs')
+            .then((response: any) => {
+                observer.next(response);
+                observer.complete();
+            })
+            .catch((error: any) => {
+                observer.error(error);
+            });
+    });
+}

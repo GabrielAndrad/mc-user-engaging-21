@@ -1,4 +1,4 @@
-import { ComboMenu, LoadEvolucaoDiaria, LoadIndicadoresOperacionais, LoadRankingVarejo } from './../services/Indicadores-service';
+import { ComboMenu, LoadEvolucaoDiaria, LoadIndicadoresOperacionais, LoadRankingVarejo, LoadResponsaveisCs } from './../services/Indicadores-service';
 import { createStore } from "luffie";
 import { LoadIndicadores, LoadMaisAcessada, LoadMediaAcessos, LoadNpsDetalhes, LoadUsuarioAtivosDetalhes, LoadUtilizacaoPorFuncionalidade, LoadVarejoMaisEngajado } from "@/services/Indicadores-service";
 import { createAndRegisterManagedStore } from "@/utils/managed-subscription-store";
@@ -69,7 +69,9 @@ const initialData = {
         funcionalidade: [],
         varejo: [],
         Nps: [],
-        PeriodosRapidos: []
+        PeriodosRapidos: [],
+        csResponsavel: [] as any[],
+        loadingCsResponsavel: true
     },
     DataMaisAcessada: null,
     OpenMaisAcessada: false
@@ -521,10 +523,23 @@ const LoadComboMenu = () => {
     createManagedSubscription(
         ComboMenu(),
         (response) => {
-            updateState({ Combos: {...response,funcionalidade:response}, IsloadingComboMenu: false })
+            const currentCombos = getCurrentState().Combos || {} as any;
+            updateState({ Combos: {...currentCombos, funcionalidade: response} as any, IsloadingComboMenu: false })
         }, (error) => {
             message.error('Erro ao carregar Indicadores');
-            updateState({ Combos: null, IsloadingComboMenu: false })
+            updateState({ IsloadingComboMenu: false })
+        }
+    )
+}
+
+const LoadCsResponsaveis = () => {
+    createManagedSubscription(
+        LoadResponsaveisCs(),
+        (response) => {
+            const currentCombos = getCurrentState().Combos || {} as any;
+            updateState({ Combos: {...currentCombos, csResponsavel: response, loadingCsResponsavel: false} as any })
+        }, (error) => {
+            console.error('Erro ao carregar CS Responsáveis', error);
         }
     )
 }
@@ -579,6 +594,7 @@ const LoadIndicadoresAll = () => {
     LoadUserDetalhe(Itens);
     LoadOperacionais(Itens);
     LoadComboMenu();
+    LoadCsResponsaveis();
 }
 
 export {
@@ -595,6 +611,7 @@ export {
     LoadUserDetalhe,
     LoadComboMenu,
     LoadOperacionais,
+    LoadCsResponsaveis,
     updateValuesFilters,
     LoadIndicadoresAll
 }
