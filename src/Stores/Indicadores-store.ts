@@ -1,4 +1,4 @@
-import { ComboMenu, LoadEvolucaoDiaria, LoadRankingVarejo } from './../services/Indicadores-service';
+import { ComboMenu, LoadEvolucaoDiaria, LoadIndicadoresOperacionais, LoadRankingVarejo } from './../services/Indicadores-service';
 import { createStore } from "luffie";
 import { LoadIndicadores, LoadMaisAcessada, LoadMediaAcessos, LoadNpsDetalhes, LoadUsuarioAtivosDetalhes, LoadUtilizacaoPorFuncionalidade, LoadVarejoMaisEngajado } from "@/services/Indicadores-service";
 import { createAndRegisterManagedStore } from "@/utils/managed-subscription-store";
@@ -34,6 +34,8 @@ const initialData = {
     IsloadingEvolucaoDiaria: false,
     IsloadingRankingVarejo: false,
     IsloadingComboMenu: false,
+    IsloadingOperacionais: false,
+    DataOperacionais: null,
     OpenActiveUsersModal: false,
     DataUsuariosAtivosDetalhes: [],
     OpenNpsModal: false,
@@ -59,7 +61,9 @@ const initialData = {
         funcionalidade: null,
         varejo: null,
         Nps: null,
-        PeriodosRapidos: null
+        PeriodosRapidos: null,
+        csResponsavel: null,
+        segmento: null
     },
     Combos: {
         funcionalidade: [],
@@ -488,6 +492,29 @@ const RankingVarejo = (Itens) => {
     )
 }
 
+const LoadOperacionais = (Itens) => {
+    const { ValuesFilters } = getCurrentState();
+    const params = {
+        inicioVigencia: Itens.InicioVigencia,
+        fimVigencia: Itens.FimVigencia,
+        varejo: Itens.Varejo && Itens.Varejo.length > 0 ? Itens.Varejo : [],
+        usuarioId: ValuesFilters.csResponsavel || null,
+        TipoClienteId: ValuesFilters.segmento || null
+    };
+
+    updateState({ IsloadingOperacionais: true });
+    createManagedSubscription(
+        LoadIndicadoresOperacionais(params),
+        (response) => {
+            updateState({ DataOperacionais: response, IsloadingOperacionais: false });
+        },
+        (error) => {
+            message.error('Erro ao carregar Indicadores Operacionais');
+            updateState({ DataOperacionais: null, IsloadingOperacionais: false });
+        }
+    );
+};
+
 const LoadComboMenu = () => {
 
     updateState({ IsloadingComboMenu: true })
@@ -550,6 +577,7 @@ const LoadIndicadoresAll = () => {
     EvolucaoDiaria(Itens);
     RankingVarejo(Itens);
     LoadUserDetalhe(Itens);
+    LoadOperacionais(Itens);
     LoadComboMenu();
 }
 
@@ -566,6 +594,7 @@ export {
     RankingVarejo,
     LoadUserDetalhe,
     LoadComboMenu,
+    LoadOperacionais,
     updateValuesFilters,
     LoadIndicadoresAll
 }

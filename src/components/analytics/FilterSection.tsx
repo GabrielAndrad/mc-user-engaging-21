@@ -48,9 +48,9 @@ const NPS_OPTIONS = [
 ];
 
 const SEGMENTO_OPTIONS = [
-  { value: 'SMB', label: 'SMB' },
-  { value: 'ENTERPRISE', label: 'Enterprise' },
-  { value: 'CRIALED', label: 'Crialed' },
+  { value: 1, label: 'Enterprise' },
+  { value: 2, label: 'SMB' },
+  { value: 3, label: 'Crialed' },
 ];
 
 export function FilterSection({

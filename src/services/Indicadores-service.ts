@@ -131,6 +131,19 @@ export const LoadRankingVarejo= (params:Indicadores): Observable<any> => {
     });
 }
 
+export const LoadIndicadoresOperacionais = (params: any): Observable<any> => {
+    return new Observable((observer) => {
+        apiService.post('/Engajamento/indicadores-operacionais', params)
+            .then((response: any) => {
+                observer.next(response);
+                observer.complete();
+            })
+            .catch((error: any) => {
+                observer.error(error);
+            });
+    });
+}
+
 export const ComboMenu= (): Observable<any> => {
     return new Observable((observer) => {
         apiService.get('/Menu/listar')
