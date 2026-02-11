@@ -332,6 +332,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
           produtos: 3891,
           tarefas: 5620,
           inventariosAlterados: 947,
+          avaliacoesFoto: 2314,
         }} />
       </div>
 

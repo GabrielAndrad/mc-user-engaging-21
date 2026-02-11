@@ -4,7 +4,8 @@ import {
   PlayCircleOutlined,
   ShoppingOutlined,
   CheckSquareOutlined,
-  SyncOutlined
+  SyncOutlined,
+  CameraOutlined
 } from '@ant-design/icons';
 
 const { Text } = Typography;
@@ -15,6 +16,7 @@ export interface OperationalMetricsData {
   produtos: number;
   tarefas: number;
   inventariosAlterados: number;
+  avaliacoesFoto: number;
 }
 
 interface OperationalMetricsProps {
@@ -24,38 +26,45 @@ interface OperationalMetricsProps {
 const metrics = [
   {
     key: 'contratos' as const,
-    title: 'Qtde de Contratos',
+    title: 'Contratos',
     icon: <FileTextOutlined style={{ color: '#1890ff', fontSize: '24px' }} />,
     color: '#1890ff',
     bgColor: '#e6f7ff',
   },
   {
     key: 'execucoes' as const,
-    title: 'Qtde de Execuções',
+    title: 'Execuções',
     icon: <PlayCircleOutlined style={{ color: '#52c41a', fontSize: '24px' }} />,
     color: '#52c41a',
     bgColor: '#f6ffed',
   },
   {
     key: 'produtos' as const,
-    title: 'Qtde de Produtos',
+    title: 'Produtos',
     icon: <ShoppingOutlined style={{ color: '#fa8c16', fontSize: '24px' }} />,
     color: '#fa8c16',
     bgColor: '#fff7e6',
   },
   {
     key: 'tarefas' as const,
-    title: 'Qtde de Tarefas',
+    title: 'Tarefas',
     icon: <CheckSquareOutlined style={{ color: '#722ed1', fontSize: '24px' }} />,
     color: '#722ed1',
     bgColor: '#f9f0ff',
   },
   {
     key: 'inventariosAlterados' as const,
-    title: 'Qtde de Inventários Alterados',
+    title: 'Inventários Alterados',
     icon: <SyncOutlined style={{ color: '#eb2f96', fontSize: '24px' }} />,
     color: '#eb2f96',
     bgColor: '#fff0f6',
+  },
+  {
+    key: 'avaliacoesFoto' as const,
+    title: 'Avaliações de Foto',
+    icon: <CameraOutlined style={{ color: '#13c2c2', fontSize: '24px' }} />,
+    color: '#13c2c2',
+    bgColor: '#e6fffb',
   },
 ];
 
