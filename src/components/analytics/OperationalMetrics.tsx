@@ -16,7 +16,7 @@ export interface OperationalMetricsData {
   produtos: number;
   tarefas: number;
   inventariosAlterados: number;
-  avaliacoesFoto: number;
+  fluxoPagamento: number;
 }
 
 interface OperationalMetricsProps {
@@ -60,8 +60,8 @@ const metrics = [
     bgColor: '#fff0f6',
   },
   {
-    key: 'avaliacoesFoto' as const,
-    title: 'Avaliações de Foto',
+    key: 'fluxoPagamento' as const,
+    title: 'Fluxo de Pagamento',
     icon: <CameraOutlined style={{ color: '#13c2c2', fontSize: '24px' }} />,
     color: '#13c2c2',
     bgColor: '#e6fffb',
