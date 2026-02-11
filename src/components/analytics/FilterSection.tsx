@@ -178,7 +178,7 @@ export function FilterSection({
             <Select
               value={ValuesFilters.csResponsavel}
               onChange={(value) => onFiltersChange('csResponsavel', value)}
-              placeholder="Selecionar CS..."
+              placeholder="Todos"
               style={{ width: '100%' }}
               allowClear
               showSearch
@@ -188,8 +188,9 @@ export function FilterSection({
                 option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
+              <Select.Option key="todos" value={null}>Todos</Select.Option>
               {Combos && Combos.csResponsavel ? Combos.csResponsavel.map((cs: any) => (
-                <Select.Option key={cs.Id} value={cs.Id}>{cs.Nome}</Select.Option>
+                <Select.Option key={cs.id} value={cs.id}>{cs.nome}</Select.Option>
               )) : []}
             </Select>
           </Space>
@@ -201,10 +202,11 @@ export function FilterSection({
             <Select
               value={ValuesFilters.segmento}
               onChange={(value) => onFiltersChange('segmento', value)}
-              placeholder="Todos os segmentos"
+              placeholder="Todos"
               style={{ width: '100%' }}
               allowClear
             >
+              <Select.Option key="todos" value={null}>Todos</Select.Option>
               {SEGMENTO_OPTIONS.map(option => (
                 <Select.Option key={option.value} value={option.value}>{option.label}</Select.Option>
               ))}
