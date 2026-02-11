@@ -78,6 +78,8 @@ interface KPISectionProps {
   IsloadingUsuariosAtivosDetalhes: boolean;
   IsloadingRankingVarejo: boolean;
   loadingVarejoMaisEngajado?: boolean;
+  IsloadingOperacionais?: boolean;
+  DataOperacionais?: any;
 }
 
 export const KPISection: React.FC<KPISectionProps> = ({
@@ -103,6 +105,8 @@ export const KPISection: React.FC<KPISectionProps> = ({
   IsloadingUsuariosAtivosDetalhes,
   IsloadingEvolucaoDiaria,
   IsloadingUtilizacaoPorFuncionalidade,
+  IsloadingOperacionais,
+  DataOperacionais,
 }) => {
 
   const handleExportDashboard = () => {
@@ -318,23 +322,25 @@ export const KPISection: React.FC<KPISectionProps> = ({
       </Spin>
 
       {/* Operational Metrics */}
-      <div style={{
-        background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        border: '1px solid #f1f5f9',
-        overflow: 'hidden',
-        marginBottom: '12px'
-      }}>
-        <OperationalMetrics data={{
-          contratos: 1245,
-          execucoes: 8732,
-          produtos: 3891,
-          tarefas: 5620,
-          inventariosAlterados: 947,
-          fluxoPagamento: 2314,
-        }} />
-      </div>
+      <Spin spinning={!!IsloadingOperacionais}>
+        <div style={{
+          background: 'white',
+          borderRadius: '16px',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+          border: '1px solid #f1f5f9',
+          overflow: 'hidden',
+          marginBottom: '12px'
+        }}>
+          <OperationalMetrics data={{
+            contratos: DataOperacionais?.contratosCadastrados ?? 0,
+            execucoes: DataOperacionais?.execucoesEnviadas ?? 0,
+            produtos: DataOperacionais?.produtosCadastrados ?? 0,
+            tarefas: DataOperacionais?.tarefasCadastradas ?? 0,
+            inventariosAlterados: DataOperacionais?.inventariosAlterados ?? 0,
+            fluxoPagamento: DataOperacionais?.fluxoPagamentoParcelasCadastradas ?? 0,
+          }} />
+        </div>
+      </Spin>
 
       <div style={{
         textAlign: 'center',
