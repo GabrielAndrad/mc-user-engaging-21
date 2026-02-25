@@ -14,6 +14,8 @@ const { Title } = Typography;
 export interface FilterState {
   dataInicio: Date;
   dataFim: Date;
+  dataInicioComparacao?: Date | string | null;
+  dataFimComparacao?: Date | string | null;
   funcionalidade: number[];
   varejo: number[];
   Nps: number[];
@@ -242,7 +244,7 @@ export function FilterSection({
       {showAdvanced && (
         <>
           <Divider />
-          <Row gutter={[16, 16]}>
+          <Row gutter={[16, 16]} style={{ alignItems: 'flex-end' }}>
             <Col xs={24} sm={12} md={8}>
               <Space direction="vertical" style={{ width: '100%' }}>
                 <Typography.Text strong>Períodos Rápidos</Typography.Text>
@@ -253,12 +255,39 @@ export function FilterSection({
                       size="small"
                       onClick={()=>handleDatePreset(preset.value)}
                       type="dashed"
-
                     >
                       {preset.label}
                     </Button>
                   ))}
                 </Space>
+              </Space>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Typography.Text strong>Período de Comparação</Typography.Text>
+                <RangePicker
+                  value={
+                    ValuesFilters?.dataInicioComparacao && ValuesFilters?.dataFimComparacao
+                      ? [
+                          dayjs(ValuesFilters.dataInicioComparacao),
+                          dayjs(ValuesFilters.dataFimComparacao)
+                        ]
+                      : null
+                  }
+                  onChange={(dates) => {
+                    const formatDate = (date: any) => date ? date.format('YYYY-MM-DD') : null;
+                    onFiltersChange('dataInicioComparacao', dates ? formatDate(dates[0]) : null);
+                    onFiltersChange('dataFimComparacao', dates ? formatDate(dates[1]) : null);
+                  }}
+                  format="DD/MM/YYYY"
+                  placeholder={['Início comparação', 'Fim comparação']}
+                  style={{ width: '100%' }}
+                  suffixIcon={<CalendarOutlined />}
+                  allowClear
+                />
+                <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
+                  Deixe vazio para comparar com o mesmo período do ano anterior
+                </Typography.Text>
               </Space>
             </Col>
           </Row>

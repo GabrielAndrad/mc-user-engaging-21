@@ -147,7 +147,24 @@ function calcVariation(current: number, previous?: number): { pct: number; direc
 
 function VariationBadge({ current, previous, format }: { current: number; previous?: number; format?: string }) {
   const variation = calcVariation(current, previous);
-  if (!variation) return null;
+  if (!variation) {
+    return (
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        fontSize: '11px',
+        color: '#8c8c8c',
+        fontWeight: 500,
+        backgroundColor: '#f5f5f5',
+        padding: '2px 6px',
+        borderRadius: '4px',
+        marginTop: '4px',
+      }}>
+        <MinusOutlined style={{ fontSize: '10px', marginRight: '2px' }} />
+        Sem comparação
+      </div>
+    );
+  }
 
   const color = variation.direction === 'up' ? '#52c41a' : variation.direction === 'down' ? '#ff4d4f' : '#8c8c8c';
   const Icon = variation.direction === 'up' ? CaretUpOutlined : variation.direction === 'down' ? CaretDownOutlined : MinusOutlined;
