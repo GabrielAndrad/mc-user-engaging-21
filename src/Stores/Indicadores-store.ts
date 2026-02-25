@@ -63,7 +63,9 @@ const initialData = {
         Nps: null,
         PeriodosRapidos: null,
         csResponsavel: null,
-        segmento: null
+        segmento: null,
+        dataInicioComparacao: null,
+        dataFimComparacao: null
     },
     Combos: {
         funcionalidade: [],
@@ -509,18 +511,34 @@ const RankingVarejo = (Itens) => {
 const LoadOperacionais = (Itens) => {
     const { ValuesFilters } = getCurrentState();
 
-    // Calcular período de comparação (mesmo range, -1 ano)
+    // Calcular período de comparação: usa período personalizado ou -1 ano
     const calcAnoAnterior = (dateStr: string) => {
         const d = new Date(dateStr);
         d.setFullYear(d.getFullYear() - 1);
         return d.toISOString().slice(0, 10);
     };
 
+    const formatDateStr = (date: Date | string) => {
+        if (typeof date === 'string') {
+            if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+            const d = new Date(date);
+            return !isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : '';
+        }
+        return date.toISOString().slice(0, 10);
+    };
+
+    const inicioComp = ValuesFilters.dataInicioComparacao
+        ? formatDateStr(ValuesFilters.dataInicioComparacao)
+        : calcAnoAnterior(Itens.InicioVigencia);
+    const fimComp = ValuesFilters.dataFimComparacao
+        ? formatDateStr(ValuesFilters.dataFimComparacao)
+        : calcAnoAnterior(Itens.FimVigencia);
+
     const params = {
         inicioVigencia: Itens.InicioVigencia,
         fimVigencia: Itens.FimVigencia,
-        inicioVigenciaComparacao: calcAnoAnterior(Itens.InicioVigencia),
-        fimVigenciaComparacao: calcAnoAnterior(Itens.FimVigencia),
+        inicioVigenciaComparacao: inicioComp,
+        fimVigenciaComparacao: fimComp,
         varejo: Itens.Varejo && Itens.Varejo.length > 0 ? Itens.Varejo : [],
         usuarioId: ValuesFilters.csResponsavel || null,
         TipoClienteId: ValuesFilters.segmento || null
