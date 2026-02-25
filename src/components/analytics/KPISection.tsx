@@ -246,8 +246,16 @@ export const KPISection: React.FC<KPISectionProps> = ({
             tarefas: DataOperacionais?.tarefasCadastradas ?? 0,
             inventariosAlterados: DataOperacionais?.inventariosAlterados ?? 0,
             fluxoPagamento: DataOperacionais?.fluxoPagamentoParcelasCadastradas ?? 0,
-            totalReceita: DataOperacionais?.totalReceita ?? 125430.50,
-            percentualExecucao: DataOperacionais?.percentualExecucao ?? 78.5,
+            totalReceita: DataOperacionais?.receitaTotalContratos ?? 0,
+            percentualExecucao: DataOperacionais?.porcentagemExecucao ?? 0,
+            contratosAnoAnterior: DataOperacionais?.contratosCadastradosAnoAnterior,
+            execucoesAnoAnterior: DataOperacionais?.execucoesEnviadasAnoAnterior,
+            produtosAnoAnterior: DataOperacionais?.produtosCadastradosAnoAnterior,
+            tarefasAnoAnterior: DataOperacionais?.tarefasCadastradasAnoAnterior,
+            inventariosAlteradosAnoAnterior: DataOperacionais?.inventariosAlteradosAnoAnterior,
+            fluxoPagamentoAnoAnterior: DataOperacionais?.fluxoPagamentoParcelasCadastradasAnoAnterior,
+            totalReceitaAnoAnterior: DataOperacionais?.receitaTotalContratosAnoAnterior,
+            percentualExecucaoAnoAnterior: DataOperacionais?.porcentagemExecucaoAnoAnterior,
           }} />
         </div>
       </Spin>

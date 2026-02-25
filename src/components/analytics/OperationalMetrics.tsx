@@ -1,4 +1,4 @@
-import { Card, Row, Col, Typography } from 'antd';
+import { Card, Row, Col, Typography, Tooltip } from 'antd';
 import {
   FileTextOutlined,
   PlayCircleOutlined,
@@ -9,7 +9,10 @@ import {
   DollarOutlined,
   PercentageOutlined,
   DownOutlined,
-  UpOutlined
+  UpOutlined,
+  CaretUpOutlined,
+  CaretDownOutlined,
+  MinusOutlined
 } from '@ant-design/icons';
 import { useState } from 'react';
 
@@ -24,22 +27,46 @@ export interface OperationalMetricsData {
   fluxoPagamento: number;
   totalReceita: number;
   percentualExecucao: number;
+  // Ano anterior
+  contratosAnoAnterior?: number;
+  execucoesAnoAnterior?: number;
+  produtosAnoAnterior?: number;
+  tarefasAnoAnterior?: number;
+  inventariosAlteradosAnoAnterior?: number;
+  fluxoPagamentoAnoAnterior?: number;
+  totalReceitaAnoAnterior?: number;
+  percentualExecucaoAnoAnterior?: number;
 }
 
 interface OperationalMetricsProps {
   data: OperationalMetricsData;
 }
 
-const mainMetrics = [
+type MetricKey = 'contratos' | 'execucoes' | 'produtos' | 'tarefas' | 'inventariosAlterados' | 'fluxoPagamento' | 'totalReceita' | 'percentualExecucao';
+type MetricKeyAnoAnterior = 'contratosAnoAnterior' | 'execucoesAnoAnterior' | 'produtosAnoAnterior' | 'tarefasAnoAnterior' | 'inventariosAlteradosAnoAnterior' | 'fluxoPagamentoAnoAnterior' | 'totalReceitaAnoAnterior' | 'percentualExecucaoAnoAnterior';
+
+interface MetricConfig {
+  key: MetricKey;
+  keyAnoAnterior: MetricKeyAnoAnterior;
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
+  format?: string;
+}
+
+const mainMetrics: MetricConfig[] = [
   {
-    key: 'contratos' as const,
+    key: 'contratos',
+    keyAnoAnterior: 'contratosAnoAnterior',
     title: 'Qtde Contratos',
     icon: <FileTextOutlined style={{ color: '#1890ff', fontSize: '24px' }} />,
     color: '#1890ff',
     bgColor: '#e6f7ff',
   },
   {
-    key: 'totalReceita' as const,
+    key: 'totalReceita',
+    keyAnoAnterior: 'totalReceitaAnoAnterior',
     title: 'Total de Receita',
     icon: <DollarOutlined style={{ color: '#52c41a', fontSize: '24px' }} />,
     color: '#52c41a',
@@ -47,7 +74,8 @@ const mainMetrics = [
     format: 'currency',
   },
   {
-    key: 'percentualExecucao' as const,
+    key: 'percentualExecucao',
+    keyAnoAnterior: 'percentualExecucaoAnoAnterior',
     title: '% de Execução',
     icon: <PercentageOutlined style={{ color: '#fa8c16', fontSize: '24px' }} />,
     color: '#fa8c16',
@@ -56,37 +84,42 @@ const mainMetrics = [
   },
 ];
 
-const expandedMetrics = [
+const expandedMetrics: MetricConfig[] = [
   {
-    key: 'execucoes' as const,
+    key: 'execucoes',
+    keyAnoAnterior: 'execucoesAnoAnterior',
     title: 'Execuções',
     icon: <PlayCircleOutlined style={{ color: '#52c41a', fontSize: '24px' }} />,
     color: '#52c41a',
     bgColor: '#f6ffed',
   },
   {
-    key: 'produtos' as const,
+    key: 'produtos',
+    keyAnoAnterior: 'produtosAnoAnterior',
     title: 'Produtos',
     icon: <ShoppingOutlined style={{ color: '#fa8c16', fontSize: '24px' }} />,
     color: '#fa8c16',
     bgColor: '#fff7e6',
   },
   {
-    key: 'tarefas' as const,
+    key: 'tarefas',
+    keyAnoAnterior: 'tarefasAnoAnterior',
     title: 'Tarefas',
     icon: <CheckSquareOutlined style={{ color: '#722ed1', fontSize: '24px' }} />,
     color: '#722ed1',
     bgColor: '#f9f0ff',
   },
   {
-    key: 'inventariosAlterados' as const,
+    key: 'inventariosAlterados',
+    keyAnoAnterior: 'inventariosAlteradosAnoAnterior',
     title: 'Inventários Alterados',
     icon: <SyncOutlined style={{ color: '#eb2f96', fontSize: '24px' }} />,
     color: '#eb2f96',
     bgColor: '#fff0f6',
   },
   {
-    key: 'fluxoPagamento' as const,
+    key: 'fluxoPagamento',
+    keyAnoAnterior: 'fluxoPagamentoAnoAnterior',
     title: 'Fluxo de Pagamento',
     icon: <CameraOutlined style={{ color: '#13c2c2', fontSize: '24px' }} />,
     color: '#13c2c2',
@@ -104,14 +137,54 @@ function formatValue(value: number, format?: string) {
   return (value ?? 0).toLocaleString('pt-BR');
 }
 
-function MetricCard({ metric, data }: { metric: { key: keyof OperationalMetricsData; title: string; icon: React.ReactNode; color: string; bgColor: string; format?: string }, data: OperationalMetricsData }) {
+function calcVariation(current: number, previous?: number): { pct: number; direction: 'up' | 'down' | 'equal' } | null {
+  if (previous == null) return null;
+  if (previous === 0 && current === 0) return { pct: 0, direction: 'equal' };
+  if (previous === 0) return { pct: 100, direction: 'up' };
+  const pct = ((current - previous) / Math.abs(previous)) * 100;
+  return { pct: Math.abs(pct), direction: pct > 0 ? 'up' : pct < 0 ? 'down' : 'equal' };
+}
+
+function VariationBadge({ current, previous, format }: { current: number; previous?: number; format?: string }) {
+  const variation = calcVariation(current, previous);
+  if (!variation) return null;
+
+  const color = variation.direction === 'up' ? '#52c41a' : variation.direction === 'down' ? '#ff4d4f' : '#8c8c8c';
+  const Icon = variation.direction === 'up' ? CaretUpOutlined : variation.direction === 'down' ? CaretDownOutlined : MinusOutlined;
+  const previousFormatted = previous != null ? formatValue(previous, format) : '';
+
+  return (
+    <Tooltip title={`Ano anterior: ${previousFormatted}`}>
+      <div style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '2px',
+        fontSize: '11px',
+        color,
+        fontWeight: 600,
+        backgroundColor: `${color}15`,
+        padding: '2px 6px',
+        borderRadius: '4px',
+        marginTop: '4px',
+      }}>
+        <Icon style={{ fontSize: '10px' }} />
+        {variation.pct.toFixed(1)}%
+      </div>
+    </Tooltip>
+  );
+}
+
+function MetricCard({ metric, data }: { metric: MetricConfig; data: OperationalMetricsData }) {
+  const currentValue = data[metric.key] ?? 0;
+  const previousValue = data[metric.keyAnoAnterior];
+
   return (
     <Card
       style={{
         backgroundColor: metric.bgColor,
         border: `2px solid ${metric.color}`,
         borderRadius: '12px',
-        height: '140px',
+        height: '150px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -126,7 +199,7 @@ function MetricCard({ metric, data }: { metric: { key: keyof OperationalMetricsD
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        margin: '0 auto 10px',
+        margin: '0 auto 8px',
       }}>
         {metric.icon}
       </div>
@@ -135,14 +208,16 @@ function MetricCard({ metric, data }: { metric: { key: keyof OperationalMetricsD
         fontWeight: 700,
         color: metric.color,
         lineHeight: 1,
-        marginBottom: '6px',
+        marginBottom: '4px',
       }}>
-        {formatValue(data[metric.key] ?? 0, (metric as any).format)}
+        {formatValue(currentValue, metric.format)}
       </div>
+      <VariationBadge current={currentValue} previous={previousValue} format={metric.format} />
       <div style={{
         fontSize: '11px',
         color: '#595959',
         fontWeight: 500,
+        marginTop: '4px',
       }}>
         {metric.title}
       </div>
