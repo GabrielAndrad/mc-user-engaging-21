@@ -5,8 +5,13 @@ import {
   ShoppingOutlined,
   CheckSquareOutlined,
   SyncOutlined,
-  CameraOutlined
+  CameraOutlined,
+  DollarOutlined,
+  PercentageOutlined,
+  DownOutlined,
+  UpOutlined
 } from '@ant-design/icons';
+import { useState } from 'react';
 
 const { Text } = Typography;
 
@@ -17,20 +22,41 @@ export interface OperationalMetricsData {
   tarefas: number;
   inventariosAlterados: number;
   fluxoPagamento: number;
+  totalReceita: number;
+  percentualExecucao: number;
 }
 
 interface OperationalMetricsProps {
   data: OperationalMetricsData;
 }
 
-const metrics = [
+const mainMetrics = [
   {
     key: 'contratos' as const,
-    title: 'Contratos',
+    title: 'Qtde Contratos',
     icon: <FileTextOutlined style={{ color: '#1890ff', fontSize: '24px' }} />,
     color: '#1890ff',
     bgColor: '#e6f7ff',
   },
+  {
+    key: 'totalReceita' as const,
+    title: 'Total de Receita',
+    icon: <DollarOutlined style={{ color: '#52c41a', fontSize: '24px' }} />,
+    color: '#52c41a',
+    bgColor: '#f6ffed',
+    format: 'currency',
+  },
+  {
+    key: 'percentualExecucao' as const,
+    title: '% de Execução',
+    icon: <PercentageOutlined style={{ color: '#fa8c16', fontSize: '24px' }} />,
+    color: '#fa8c16',
+    bgColor: '#fff7e6',
+    format: 'percent',
+  },
+];
+
+const expandedMetrics = [
   {
     key: 'execucoes' as const,
     title: 'Execuções',
@@ -68,59 +94,106 @@ const metrics = [
   },
 ];
 
+function formatValue(value: number, format?: string) {
+  if (format === 'currency') {
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  if (format === 'percent') {
+    return `${value.toFixed(1)}%`;
+  }
+  return (value ?? 0).toLocaleString('pt-BR');
+}
+
+function MetricCard({ metric, data }: { metric: { key: keyof OperationalMetricsData; title: string; icon: React.ReactNode; color: string; bgColor: string; format?: string }, data: OperationalMetricsData }) {
+  return (
+    <Card
+      style={{
+        backgroundColor: metric.bgColor,
+        border: `2px solid ${metric.color}`,
+        borderRadius: '12px',
+        height: '140px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}
+      bodyStyle={{ padding: '16px', textAlign: 'center' }}
+    >
+      <div style={{
+        width: '44px',
+        height: '44px',
+        borderRadius: '50%',
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        margin: '0 auto 10px',
+      }}>
+        {metric.icon}
+      </div>
+      <div style={{
+        fontSize: '28px',
+        fontWeight: 700,
+        color: metric.color,
+        lineHeight: 1,
+        marginBottom: '6px',
+      }}>
+        {formatValue(data[metric.key] ?? 0, (metric as any).format)}
+      </div>
+      <div style={{
+        fontSize: '11px',
+        color: '#595959',
+        fontWeight: 500,
+      }}>
+        {metric.title}
+      </div>
+    </Card>
+  );
+}
+
 export function OperationalMetrics({ data }: OperationalMetricsProps) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
     <div style={{ padding: '16px 12px' }}>
-      <Text strong style={{ fontSize: '16px', color: '#262626', display: 'block', marginBottom: '16px' }}>
-        Indicadores Operacionais
-      </Text>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <Text strong style={{ fontSize: '16px', color: '#262626' }}>
+          Indicadores Operacionais
+        </Text>
+        <div
+          onClick={() => setExpanded(!expanded)}
+          style={{
+            cursor: 'pointer',
+            color: '#1890ff',
+            fontSize: '13px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            userSelect: 'none',
+          }}
+        >
+          {expanded ? 'Recolher' : 'Ver mais'} {expanded ? <UpOutlined /> : <DownOutlined />}
+        </div>
+      </div>
+
+      {/* 3 Main Cards */}
       <Row gutter={[12, 12]}>
-        {metrics.map((metric) => (
-          <Col key={metric.key} xs={24} sm={12} md={8} lg={4} xl={4} style={{ minWidth: '19%' }}>
-            <Card
-              style={{
-                backgroundColor: metric.bgColor,
-                border: `2px solid ${metric.color}`,
-                borderRadius: '12px',
-                height: '140px',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}
-              bodyStyle={{ padding: '16px', textAlign: 'center' }}
-            >
-              <div style={{
-                width: '44px',
-                height: '44px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255,255,255,0.8)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 10px',
-              }}>
-                {metric.icon}
-              </div>
-              <div style={{
-                fontSize: '28px',
-                fontWeight: 700,
-                color: metric.color,
-                lineHeight: 1,
-                marginBottom: '6px',
-              }}>
-                {(data[metric.key] ?? 0).toLocaleString('pt-BR')}
-              </div>
-              <div style={{
-                fontSize: '11px',
-                color: '#595959',
-                fontWeight: 500,
-              }}>
-                {metric.title}
-              </div>
-            </Card>
+        {mainMetrics.map((metric) => (
+          <Col key={metric.key} xs={24} sm={8} md={8}>
+            <MetricCard metric={metric} data={data} />
           </Col>
         ))}
       </Row>
+
+      {/* Expanded Cards */}
+      {expanded && (
+        <Row gutter={[12, 12]} style={{ marginTop: '12px' }}>
+          {expandedMetrics.map((metric) => (
+            <Col key={metric.key} xs={24} sm={12} md={8} lg={4} xl={4} style={{ minWidth: '19%' }}>
+              <MetricCard metric={metric} data={data} />
+            </Col>
+          ))}
+        </Row>
+      )}
     </div>
   );
 }
