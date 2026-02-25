@@ -508,9 +508,19 @@ const RankingVarejo = (Itens) => {
 
 const LoadOperacionais = (Itens) => {
     const { ValuesFilters } = getCurrentState();
+
+    // Calcular período de comparação (mesmo range, -1 ano)
+    const calcAnoAnterior = (dateStr: string) => {
+        const d = new Date(dateStr);
+        d.setFullYear(d.getFullYear() - 1);
+        return d.toISOString().slice(0, 10);
+    };
+
     const params = {
         inicioVigencia: Itens.InicioVigencia,
         fimVigencia: Itens.FimVigencia,
+        inicioVigenciaComparacao: calcAnoAnterior(Itens.InicioVigencia),
+        fimVigenciaComparacao: calcAnoAnterior(Itens.FimVigencia),
         varejo: Itens.Varejo && Itens.Varejo.length > 0 ? Itens.Varejo : [],
         usuarioId: ValuesFilters.csResponsavel || null,
         TipoClienteId: ValuesFilters.segmento || null
