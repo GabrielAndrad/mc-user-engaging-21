@@ -93,6 +93,9 @@ export function FilterSection({
   const [periodType, setPeriodType] = useState<string>('ano');
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
+  const [compPeriodType, setCompPeriodType] = useState<string>('ano');
+  const [compSelectedYear, setCompSelectedYear] = useState<number>(new Date().getFullYear() - 1);
+  const [compSelectedMonth, setCompSelectedMonth] = useState<number>(new Date().getMonth());
   const { clientes, loading: loadingClientes } = useClientes();
 
   const handleDatePreset = (days: number) => {
@@ -135,6 +138,42 @@ export function FilterSection({
     const to = new Date(year, month + 1, 0);
     onFiltersChange('dataInicio', from.toISOString().slice(0, 10));
     onFiltersChange('dataFim', to.toISOString().slice(0, 10));
+  };
+
+  const applyCompYearPeriod = (year: number) => {
+    onFiltersChange('dataInicioComparacao', `${year}-01-01`);
+    onFiltersChange('dataFimComparacao', `${year}-12-31`);
+  };
+
+  const applyCompMonthPeriod = (year: number, month: number) => {
+    const from = new Date(year, month, 1);
+    const to = new Date(year, month + 1, 0);
+    onFiltersChange('dataInicioComparacao', from.toISOString().slice(0, 10));
+    onFiltersChange('dataFimComparacao', to.toISOString().slice(0, 10));
+  };
+
+  const handleCompPeriodTypeChange = (type: string) => {
+    setCompPeriodType(type);
+    if (type === 'ano') {
+      applyCompYearPeriod(compSelectedYear);
+    } else if (type === 'mes') {
+      applyCompMonthPeriod(compSelectedYear, compSelectedMonth);
+    } else if (type === 'semana') {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const from = new Date(now);
+      from.setDate(now.getDate() - dayOfWeek - 7);
+      const to = new Date(from);
+      to.setDate(from.getDate() + 6);
+      onFiltersChange('dataInicioComparacao', from.toISOString().slice(0, 10));
+      onFiltersChange('dataFimComparacao', to.toISOString().slice(0, 10));
+    } else if (type === 'dia') {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const d = yesterday.toISOString().slice(0, 10);
+      onFiltersChange('dataInicioComparacao', d);
+      onFiltersChange('dataFimComparacao', d);
+    }
   };
 
   const dateValue: [Dayjs | null, Dayjs | null] | null =
@@ -213,28 +252,65 @@ export function FilterSection({
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Período de Comparação</Typography.Text>
             <Space wrap>
-              <RangePicker
-                value={
-                  ValuesFilters?.dataInicioComparacao && ValuesFilters?.dataFimComparacao
-                    ? [
-                        dayjs(ValuesFilters.dataInicioComparacao),
-                        dayjs(ValuesFilters.dataFimComparacao)
-                      ]
-                    : null
-                }
-                onChange={(dates) => {
-                  const formatDate = (date: any) => date ? date.format('YYYY-MM-DD') : null;
-                  onFiltersChange('dataInicioComparacao', dates ? formatDate(dates[0]) : null);
-                  onFiltersChange('dataFimComparacao', dates ? formatDate(dates[1]) : null);
-                }}
-                format="DD/MM/YYYY"
-                placeholder={['Início comparação', 'Fim comparação']}
-                suffixIcon={<CalendarOutlined />}
-                allowClear
+              <Select
+                value={compPeriodType}
+                onChange={handleCompPeriodTypeChange}
+                style={{ width: 120 }}
+                options={PERIOD_TYPE_OPTIONS}
               />
-              <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
-                Vazio = mesmo período do ano anterior
-              </Typography.Text>
+              {(compPeriodType === 'ano' || compPeriodType === 'mes') && (
+                <Select
+                  value={compSelectedYear}
+                  onChange={(year) => {
+                    setCompSelectedYear(year);
+                    if (compPeriodType === 'ano') applyCompYearPeriod(year);
+                    else applyCompMonthPeriod(year, compSelectedMonth);
+                  }}
+                  style={{ width: 100 }}
+                  options={YEAR_OPTIONS}
+                />
+              )}
+              {compPeriodType === 'mes' && (
+                <Select
+                  value={compSelectedMonth}
+                  onChange={(month) => {
+                    setCompSelectedMonth(month);
+                    applyCompMonthPeriod(compSelectedYear, month);
+                  }}
+                  style={{ width: 130 }}
+                  options={MONTH_OPTIONS}
+                />
+              )}
+              {compPeriodType === 'periodo' ? (
+                <RangePicker
+                  value={
+                    ValuesFilters?.dataInicioComparacao && ValuesFilters?.dataFimComparacao
+                      ? [dayjs(ValuesFilters.dataInicioComparacao), dayjs(ValuesFilters.dataFimComparacao)]
+                      : null
+                  }
+                  onChange={(dates) => {
+                    const formatDate = (date: any) => date ? date.format('YYYY-MM-DD') : null;
+                    onFiltersChange('dataInicioComparacao', dates ? formatDate(dates[0]) : null);
+                    onFiltersChange('dataFimComparacao', dates ? formatDate(dates[1]) : null);
+                  }}
+                  format="DD/MM/YYYY"
+                  placeholder={['Início comparação', 'Fim comparação']}
+                  suffixIcon={<CalendarOutlined />}
+                  allowClear
+                />
+              ) : (
+                <RangePicker
+                  value={
+                    ValuesFilters?.dataInicioComparacao && ValuesFilters?.dataFimComparacao
+                      ? [dayjs(ValuesFilters.dataInicioComparacao), dayjs(ValuesFilters.dataFimComparacao)]
+                      : null
+                  }
+                  format="DD/MM/YYYY"
+                  disabled
+                  style={{ width: 240 }}
+                  suffixIcon={<CalendarOutlined />}
+                />
+              )}
             </Space>
           </Space>
         </Col>
