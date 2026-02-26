@@ -205,17 +205,28 @@ function VariationBadge({ current, previous, format }: { current: number; previo
 function MetricCard({ metric, data }: { metric: MetricConfig; data: OperationalMetricsData }) {
   const currentValue = data[metric.key] ?? 0;
   const previousValue = data[metric.keyAnoAnterior];
+  const variation = calcVariation(currentValue, previousValue);
+  
+  // Cor da borda só aparece quando há variação significativa
+  const hasAlert = variation && variation.direction !== 'equal';
+  const borderColor = hasAlert
+    ? (variation!.direction === 'up' ? '#52c41a' : '#ff4d4f')
+    : '#f0f0f0';
+  const bgColor = hasAlert
+    ? (variation!.direction === 'up' ? '#fafff5' : '#fff5f5')
+    : '#ffffff';
 
   return (
     <Card
       style={{
-        backgroundColor: metric.bgColor,
-        border: `2px solid ${metric.color}`,
+        backgroundColor: bgColor,
+        border: `1px solid ${borderColor}`,
         borderRadius: '12px',
         height: '150px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       }}
       bodyStyle={{ padding: '16px', textAlign: 'center' }}
     >
@@ -223,7 +234,7 @@ function MetricCard({ metric, data }: { metric: MetricConfig; data: OperationalM
         width: '44px',
         height: '44px',
         borderRadius: '50%',
-        backgroundColor: 'rgba(255,255,255,0.8)',
+        backgroundColor: `${metric.color}15`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -234,7 +245,7 @@ function MetricCard({ metric, data }: { metric: MetricConfig; data: OperationalM
       <div style={{
         fontSize: '28px',
         fontWeight: 700,
-        color: metric.color,
+        color: '#262626',
         lineHeight: 1,
         marginBottom: '4px',
       }}>
@@ -243,7 +254,7 @@ function MetricCard({ metric, data }: { metric: MetricConfig; data: OperationalM
       <VariationBadge current={currentValue} previous={previousValue} format={metric.format} />
       <div style={{
         fontSize: '11px',
-        color: '#595959',
+        color: '#8c8c8c',
         fontWeight: 500,
         marginTop: '4px',
       }}>
