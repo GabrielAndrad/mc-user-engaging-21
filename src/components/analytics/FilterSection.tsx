@@ -149,8 +149,9 @@ export function FilterSection({
     <Card 
       style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%' }}
     >
+      {/* Linha 1: Período de vigência + Período de comparação */}
       <Row style={{ alignItems: 'flex-end' }} gutter={[16, 16]}>
-        <Col xs={24} sm={24} md={12} lg={8}>
+        <Col xs={24} md={12}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Período de vigência</Typography.Text>
             <Space wrap>
@@ -183,7 +184,7 @@ export function FilterSection({
                   options={MONTH_OPTIONS}
                 />
               )}
-              {periodType === 'periodo' && (
+              {periodType === 'periodo' ? (
                 <RangePicker
                   value={dateValue}
                   onChange={(dates) => {
@@ -195,8 +196,7 @@ export function FilterSection({
                   placeholder={['Data inicial', 'Data final']}
                   suffixIcon={<CalendarOutlined />}
                 />
-              )}
-              {periodType !== 'periodo' && (
+              ) : (
                 <RangePicker
                   value={dateValue}
                   format="DD/MM/YYYY"
@@ -209,7 +209,40 @@ export function FilterSection({
           </Space>
         </Col>
 
-        <Col xs={24} sm={12} md={6} lg={4}>
+        <Col xs={24} md={12}>
+          <Space direction="vertical" style={{ width: '100%' }}>
+            <Typography.Text strong>Período de Comparação</Typography.Text>
+            <Space wrap>
+              <RangePicker
+                value={
+                  ValuesFilters?.dataInicioComparacao && ValuesFilters?.dataFimComparacao
+                    ? [
+                        dayjs(ValuesFilters.dataInicioComparacao),
+                        dayjs(ValuesFilters.dataFimComparacao)
+                      ]
+                    : null
+                }
+                onChange={(dates) => {
+                  const formatDate = (date: any) => date ? date.format('YYYY-MM-DD') : null;
+                  onFiltersChange('dataInicioComparacao', dates ? formatDate(dates[0]) : null);
+                  onFiltersChange('dataFimComparacao', dates ? formatDate(dates[1]) : null);
+                }}
+                format="DD/MM/YYYY"
+                placeholder={['Início comparação', 'Fim comparação']}
+                suffixIcon={<CalendarOutlined />}
+                allowClear
+              />
+              <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
+                Vazio = mesmo período do ano anterior
+              </Typography.Text>
+            </Space>
+          </Space>
+        </Col>
+      </Row>
+
+      {/* Linha 2: Demais filtros + ações */}
+      <Row style={{ alignItems: 'flex-end', marginTop: 16 }} gutter={[16, 16]}>
+        <Col xs={24} sm={12} md={4}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Funcionalidade</Typography.Text>
             <Select
@@ -224,14 +257,14 @@ export function FilterSection({
                 option?.children?.toString().toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
-              {Combos && Combos.funcionalidade?Combos.funcionalidade.map(func => (
+              {Combos && Combos.funcionalidade ? Combos.funcionalidade.map(func => (
                 <Select.Option key={func.MenuId} value={func.MenuId}>{func.Nome}</Select.Option>
-              )):[]}
+              )) : []}
             </Select>
           </Space>
         </Col>
 
-        <Col xs={24} sm={12} md={6} lg={4}>
+        <Col xs={24} sm={12} md={4}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Varejo</Typography.Text>
             <Select
@@ -256,7 +289,7 @@ export function FilterSection({
           </Space>
         </Col>
 
-        <Col xs={24} sm={12} md={6} lg={4}>
+        <Col xs={24} sm={12} md={3}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>NPS</Typography.Text>
             <Select
@@ -278,7 +311,7 @@ export function FilterSection({
           </Space>
         </Col>
 
-        <Col xs={24} sm={12} md={6} lg={4}>
+        <Col xs={24} sm={12} md={4}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>CS Responsável</Typography.Text>
             <Select
@@ -301,7 +334,7 @@ export function FilterSection({
           </Space>
         </Col>
 
-        <Col xs={24} sm={12} md={6} lg={4}>
+        <Col xs={24} sm={12} md={3}>
           <Space direction="vertical" style={{ width: '100%' }}>
             <Typography.Text strong>Tipo de Cliente</Typography.Text>
             <Select
@@ -319,29 +352,24 @@ export function FilterSection({
         </Col>
 
         <Col span={1}>
-        <Button
-              type="link"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              style={{ color: '#1890ff', padding: 0 }}
-              icon={<FilterFilled style={{ color: '#1890ff' }} />}
-            />
+          <Button
+            type="link"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            style={{ color: '#1890ff', padding: 0 }}
+            icon={<FilterFilled style={{ color: '#1890ff' }} />}
+          />
         </Col>
-        <Col span={2}>
-          <Space direction="vertical" style={{ width: '100%' }}>
-            <Button onClick={()=>LoadIndicadoresAll()} type='primary'>Filtrar</Button>
-          </Space>
+        <Col xs={12} sm={6} md={2}>
+          <Button onClick={() => LoadIndicadoresAll()} type='primary' style={{ width: '100%' }}>Filtrar</Button>
         </Col>
-
-        <Col span={4}>
-          <div style={{ display: 'flex', alignItems: 'end', height: '100%', gap: '8px', justifyContent: 'flex-end' }}>
-            <Button 
-              type="default" 
-              icon={<DownloadOutlined />} 
-              onClick={onExport}
-            >
-              Exportar CSV
-            </Button>
-          </div>
+        <Col xs={12} sm={6} md={3}>
+          <Button 
+            type="default" 
+            icon={<DownloadOutlined />} 
+            onClick={onExport}
+          >
+            Exportar CSV
+          </Button>
         </Col>
       </Row>
 
@@ -357,41 +385,13 @@ export function FilterSection({
                     <Button
                       key={preset.value}
                       size="small"
-                      onClick={()=>handleDatePreset(preset.value)}
+                      onClick={() => handleDatePreset(preset.value)}
                       type="dashed"
                     >
                       {preset.label}
                     </Button>
                   ))}
                 </Space>
-              </Space>
-            </Col>
-            <Col xs={24} sm={12} md={8}>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Typography.Text strong>Período de Comparação</Typography.Text>
-                <RangePicker
-                  value={
-                    ValuesFilters?.dataInicioComparacao && ValuesFilters?.dataFimComparacao
-                      ? [
-                          dayjs(ValuesFilters.dataInicioComparacao),
-                          dayjs(ValuesFilters.dataFimComparacao)
-                        ]
-                      : null
-                  }
-                  onChange={(dates) => {
-                    const formatDate = (date: any) => date ? date.format('YYYY-MM-DD') : null;
-                    onFiltersChange('dataInicioComparacao', dates ? formatDate(dates[0]) : null);
-                    onFiltersChange('dataFimComparacao', dates ? formatDate(dates[1]) : null);
-                  }}
-                  format="DD/MM/YYYY"
-                  placeholder={['Início comparação', 'Fim comparação']}
-                  style={{ width: '100%' }}
-                  suffixIcon={<CalendarOutlined />}
-                  allowClear
-                />
-                <Typography.Text type="secondary" style={{ fontSize: '11px' }}>
-                  Deixe vazio para comparar com o mesmo período do ano anterior
-                </Typography.Text>
               </Space>
             </Col>
           </Row>
