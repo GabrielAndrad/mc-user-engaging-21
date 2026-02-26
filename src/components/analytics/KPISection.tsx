@@ -159,9 +159,6 @@ export const KPISection: React.FC<KPISectionProps> = ({
       value: `${data.totalActiveUsers ?? 0} (${data.activeUsersPercentage ?? 0}%) de ${(data.totalUsers ?? 0).toLocaleString()}`,
       description: 'da base total',
       icon: <UserOutlined style={{ color: '#1890ff' }} />,
-      backgroundColor: '#e6f7ff',
-      borderColor: '#1890ff',
-      iconBackgroundColor: '#f0f8ff',
       isText: true
     },
     {
@@ -169,9 +166,6 @@ export const KPISection: React.FC<KPISectionProps> = ({
       value: data && data.npsScore,
       description: 'índice de satisfação',
       icon: <StarOutlined style={{ color: '#722ed1' }} />,
-      backgroundColor: '#f9f0ff',
-      borderColor: '#722ed1',
-      iconBackgroundColor: '#fcf8ff',
     },
     {
       title: 'Média de Acessos',
@@ -179,18 +173,12 @@ export const KPISection: React.FC<KPISectionProps> = ({
       suffix: '',
       description: 'média no período',
       icon: <BarChartOutlined style={{ color: '#eb2f96' }} />,
-      backgroundColor: '#fff0f6',
-      borderColor: '#eb2f96',
-      iconBackgroundColor: '#fffafc',
     },
     {
       title: 'Funcionalidade mais acessada',
       value: data.topFunctionality,
       description: 'maior engajamento',
       icon: <TrophyOutlined style={{ color: '#1890ff' }} />,
-      backgroundColor: '#e6f7ff',
-      borderColor: '#1890ff',
-      iconBackgroundColor: '#f0f8ff',
       isText: true
     },
     {
@@ -198,9 +186,6 @@ export const KPISection: React.FC<KPISectionProps> = ({
       value: data.topAccount,
       description: 'maior uso médio',
       icon: <CrownOutlined style={{ color: '#722ed1' }} />,
-      backgroundColor: '#f9f0ff',
-      borderColor: '#722ed1',
-      iconBackgroundColor: '#fcf8ff',
       isText: true
     }
   ];
@@ -276,9 +261,9 @@ export const KPISection: React.FC<KPISectionProps> = ({
               </div>
               <Card
                 style={{
-                  backgroundColor: kpi.backgroundColor,
-                  border: `2px solid ${kpi.borderColor}`,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #f0f0f0',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                   borderRadius: '8px',
                   height: '160px',
                   display: 'flex',
@@ -303,7 +288,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
                   right: '12px',
                   width: '32px',
                   height: '32px',
-                  backgroundColor: kpi.iconBackgroundColor,
+                  backgroundColor: '#f5f5f5',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
@@ -331,7 +316,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
                   <div style={{
                     fontSize: '24px',
                     fontWeight: 700,
-                    color: kpi.borderColor,
+                    color: '#262626',
                     marginBottom: '8px'
                   }}>
                     {kpi.value}{kpi.suffix}
@@ -342,7 +327,7 @@ export const KPISection: React.FC<KPISectionProps> = ({
                   <div style={{
                     fontSize: '11px',
                     color: '#8c8c8c',
-                    backgroundColor: 'rgba(255,255,255,0.8)',
+                    backgroundColor: '#f5f5f5',
                     padding: '4px 8px',
                     borderRadius: '4px',
                     marginTop: 'auto'
