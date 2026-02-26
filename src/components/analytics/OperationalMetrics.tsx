@@ -25,7 +25,10 @@ export interface OperationalMetricsData {
   tarefas: number;
   inventariosAlterados: number;
   fluxoPagamento: number;
-  totalReceita: number;
+  receitaComercial: number;
+  receitaComercialAnoAnterior?: number;
+  faturamentoRecebido: number;
+  faturamentoRecebidoAnoAnterior?: number;
   percentualExecucao: number;
   // Ano anterior
   contratosAnoAnterior?: number;
@@ -34,7 +37,6 @@ export interface OperationalMetricsData {
   tarefasAnoAnterior?: number;
   inventariosAlteradosAnoAnterior?: number;
   fluxoPagamentoAnoAnterior?: number;
-  totalReceitaAnoAnterior?: number;
   percentualExecucaoAnoAnterior?: number;
 }
 
@@ -42,8 +44,8 @@ interface OperationalMetricsProps {
   data: OperationalMetricsData;
 }
 
-type MetricKey = 'contratos' | 'execucoes' | 'produtos' | 'tarefas' | 'inventariosAlterados' | 'fluxoPagamento' | 'totalReceita' | 'percentualExecucao';
-type MetricKeyAnoAnterior = 'contratosAnoAnterior' | 'execucoesAnoAnterior' | 'produtosAnoAnterior' | 'tarefasAnoAnterior' | 'inventariosAlteradosAnoAnterior' | 'fluxoPagamentoAnoAnterior' | 'totalReceitaAnoAnterior' | 'percentualExecucaoAnoAnterior';
+type MetricKey = 'contratos' | 'execucoes' | 'produtos' | 'tarefas' | 'inventariosAlterados' | 'fluxoPagamento' | 'receitaComercial' | 'faturamentoRecebido' | 'percentualExecucao';
+type MetricKeyAnoAnterior = 'contratosAnoAnterior' | 'execucoesAnoAnterior' | 'produtosAnoAnterior' | 'tarefasAnoAnterior' | 'inventariosAlteradosAnoAnterior' | 'fluxoPagamentoAnoAnterior' | 'receitaComercialAnoAnterior' | 'faturamentoRecebidoAnoAnterior' | 'percentualExecucaoAnoAnterior';
 
 interface MetricConfig {
   key: MetricKey;
@@ -65,12 +67,21 @@ const mainMetrics: MetricConfig[] = [
     bgColor: '#e6f7ff',
   },
   {
-    key: 'totalReceita',
-    keyAnoAnterior: 'totalReceitaAnoAnterior',
-    title: 'Total de Receita',
+    key: 'receitaComercial',
+    keyAnoAnterior: 'receitaComercialAnoAnterior',
+    title: 'Receita Comercial',
     icon: <DollarOutlined style={{ color: '#52c41a', fontSize: '24px' }} />,
     color: '#52c41a',
     bgColor: '#f6ffed',
+    format: 'currency',
+  },
+  {
+    key: 'faturamentoRecebido',
+    keyAnoAnterior: 'faturamentoRecebidoAnoAnterior',
+    title: 'Faturamento Recebido',
+    icon: <DollarOutlined style={{ color: '#13c2c2', fontSize: '24px' }} />,
+    color: '#13c2c2',
+    bgColor: '#e6fffb',
     format: 'currency',
   },
   {
@@ -270,7 +281,7 @@ export function OperationalMetrics({ data }: OperationalMetricsProps) {
       {/* 3 Main Cards */}
       <Row gutter={[12, 12]}>
         {mainMetrics.map((metric) => (
-          <Col key={metric.key} xs={24} sm={8} md={8}>
+          <Col key={metric.key} xs={24} sm={12} md={6}>
             <MetricCard metric={metric} data={data} />
           </Col>
         ))}
