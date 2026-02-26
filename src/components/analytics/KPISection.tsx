@@ -246,7 +246,10 @@ export const KPISection: React.FC<KPISectionProps> = ({
             tarefas: DataOperacionais?.tarefasCadastradas ?? 0,
             inventariosAlterados: DataOperacionais?.inventariosAlterados ?? 0,
             fluxoPagamento: DataOperacionais?.fluxoPagamentoParcelasCadastradas ?? 0,
-            totalReceita: DataOperacionais?.receitaTotalContratos ?? 0,
+            receitaComercial: DataOperacionais?.receitaComercial ?? 0,
+            receitaComercialAnoAnterior: DataOperacionais?.receitaComercialAnoAnterior,
+            faturamentoRecebido: DataOperacionais?.faturamentoRecebido ?? 0,
+            faturamentoRecebidoAnoAnterior: DataOperacionais?.faturamentoRecebidoAnoAnterior,
             percentualExecucao: DataOperacionais?.porcentagemExecucao ?? 0,
             contratosAnoAnterior: DataOperacionais?.contratosCadastradosAnoAnterior,
             execucoesAnoAnterior: DataOperacionais?.execucoesEnviadasAnoAnterior,
@@ -254,7 +257,6 @@ export const KPISection: React.FC<KPISectionProps> = ({
             tarefasAnoAnterior: DataOperacionais?.tarefasCadastradasAnoAnterior,
             inventariosAlteradosAnoAnterior: DataOperacionais?.inventariosAlteradosAnoAnterior,
             fluxoPagamentoAnoAnterior: DataOperacionais?.fluxoPagamentoParcelasCadastradasAnoAnterior,
-            totalReceitaAnoAnterior: DataOperacionais?.receitaTotalContratosAnoAnterior,
             percentualExecucaoAnoAnterior: DataOperacionais?.porcentagemExecucaoAnoAnterior,
           }} />
         </div>
