@@ -55,6 +55,34 @@ const SEGMENTO_OPTIONS = [
   { value: 3, label: 'Crialed' },
 ];
 
+const PERIOD_TYPE_OPTIONS = [
+  { value: 'ano', label: 'Ano' },
+  { value: 'mes', label: 'Mês' },
+  { value: 'semana', label: 'Semana' },
+  { value: 'dia', label: 'Dia' },
+  { value: 'periodo', label: 'Período' },
+];
+
+const YEAR_OPTIONS = Array.from({ length: 10 }, (_, i) => {
+  const year = new Date().getFullYear() - i;
+  return { value: year, label: String(year) };
+});
+
+const MONTH_OPTIONS = [
+  { value: 0, label: 'Janeiro' },
+  { value: 1, label: 'Fevereiro' },
+  { value: 2, label: 'Março' },
+  { value: 3, label: 'Abril' },
+  { value: 4, label: 'Maio' },
+  { value: 5, label: 'Junho' },
+  { value: 6, label: 'Julho' },
+  { value: 7, label: 'Agosto' },
+  { value: 8, label: 'Setembro' },
+  { value: 9, label: 'Outubro' },
+  { value: 10, label: 'Novembro' },
+  { value: 11, label: 'Dezembro' },
+];
+
 export function FilterSection({
   ValuesFilters,
   onFiltersChange,
@@ -62,14 +90,49 @@ export function FilterSection({
   Combos
 }: FilterSectionProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [periodType, setPeriodType] = useState<string>('ano');
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth());
   const { clientes, loading: loadingClientes } = useClientes();
 
   const handleDatePreset = (days: number) => {
     const to = new Date();
     const from = new Date();
     from.setDate(to.getDate() - days);
+    onFiltersChange('dataInicio', from.toISOString().slice(0, 10));
+    onFiltersChange('dataFim', to.toISOString().slice(0, 10));
+  };
 
-    // Atualiza os filtros de data conforme a lógica do componente
+  const handlePeriodTypeChange = (type: string) => {
+    setPeriodType(type);
+    if (type === 'ano') {
+      applyYearPeriod(selectedYear);
+    } else if (type === 'mes') {
+      applyMonthPeriod(selectedYear, selectedMonth);
+    } else if (type === 'semana') {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const from = new Date(now);
+      from.setDate(now.getDate() - dayOfWeek);
+      const to = new Date(from);
+      to.setDate(from.getDate() + 6);
+      onFiltersChange('dataInicio', from.toISOString().slice(0, 10));
+      onFiltersChange('dataFim', to.toISOString().slice(0, 10));
+    } else if (type === 'dia') {
+      const today = new Date().toISOString().slice(0, 10);
+      onFiltersChange('dataInicio', today);
+      onFiltersChange('dataFim', today);
+    }
+  };
+
+  const applyYearPeriod = (year: number) => {
+    onFiltersChange('dataInicio', `${year}-01-01`);
+    onFiltersChange('dataFim', `${year}-12-31`);
+  };
+
+  const applyMonthPeriod = (year: number, month: number) => {
+    const from = new Date(year, month, 1);
+    const to = new Date(year, month + 1, 0);
     onFiltersChange('dataInicio', from.toISOString().slice(0, 10));
     onFiltersChange('dataFim', to.toISOString().slice(0, 10));
   };
@@ -78,30 +141,71 @@ export function FilterSection({
   ValuesFilters?.dataInicio && ValuesFilters?.dataFim
     ? [
         ValuesFilters.dataInicio ? dayjs(ValuesFilters.dataInicio) : null,
-        ValuesFilters.dataFim? dayjs(ValuesFilters.dataFim) : null
+        ValuesFilters.dataFim ? dayjs(ValuesFilters.dataFim) : null
       ]
     : null;
 
   return (
     <Card 
-      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)',width:'100%' }}
+      style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)', width: '100%' }}
     >
-      <Row style={{alignItems:'flex-end'}} gutter={[16, 16]}>
-        <Col xs={24} sm={12} md={6} lg={5}>
+      <Row style={{ alignItems: 'flex-end' }} gutter={[16, 16]}>
+        <Col xs={24} sm={24} md={12} lg={8}>
           <Space direction="vertical" style={{ width: '100%' }}>
-            <Typography.Text strong>Período</Typography.Text>
-            <RangePicker
-              value={dateValue}
-              onChange={(dates) => {
-                  const formatDate = (date) => date ? date.format('YYYY-MM-DD') : null;
-                  onFiltersChange('dataInicio', formatDate(dates[0]));
-                  onFiltersChange('dataFim', formatDate(dates[1]));
-              }}
-              format="DD/MM/YYYY"
-              placeholder={['Data inicial', 'Data final']}
-              style={{ width: '100%' }}
-              suffixIcon={<CalendarOutlined />}
-            />
+            <Typography.Text strong>Período de vigência</Typography.Text>
+            <Space wrap>
+              <Select
+                value={periodType}
+                onChange={handlePeriodTypeChange}
+                style={{ width: 120 }}
+                options={PERIOD_TYPE_OPTIONS}
+              />
+              {(periodType === 'ano' || periodType === 'mes') && (
+                <Select
+                  value={selectedYear}
+                  onChange={(year) => {
+                    setSelectedYear(year);
+                    if (periodType === 'ano') applyYearPeriod(year);
+                    else applyMonthPeriod(year, selectedMonth);
+                  }}
+                  style={{ width: 100 }}
+                  options={YEAR_OPTIONS}
+                />
+              )}
+              {periodType === 'mes' && (
+                <Select
+                  value={selectedMonth}
+                  onChange={(month) => {
+                    setSelectedMonth(month);
+                    applyMonthPeriod(selectedYear, month);
+                  }}
+                  style={{ width: 130 }}
+                  options={MONTH_OPTIONS}
+                />
+              )}
+              {periodType === 'periodo' && (
+                <RangePicker
+                  value={dateValue}
+                  onChange={(dates) => {
+                    const formatDate = (date: any) => date ? date.format('YYYY-MM-DD') : null;
+                    onFiltersChange('dataInicio', formatDate(dates?.[0]));
+                    onFiltersChange('dataFim', formatDate(dates?.[1]));
+                  }}
+                  format="DD/MM/YYYY"
+                  placeholder={['Data inicial', 'Data final']}
+                  suffixIcon={<CalendarOutlined />}
+                />
+              )}
+              {periodType !== 'periodo' && (
+                <RangePicker
+                  value={dateValue}
+                  format="DD/MM/YYYY"
+                  disabled
+                  style={{ width: 240 }}
+                  suffixIcon={<CalendarOutlined />}
+                />
+              )}
+            </Space>
           </Space>
         </Col>
 
